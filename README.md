@@ -21,7 +21,7 @@ Accounting component:
 ![alt text](https://firebasestorage.googleapis.com/v0/b/intern-4310c.appspot.com/o/true-bus%2Faccounting.png?alt=media&token=6d3c62ba-8eac-4f7c-a61b-33a10906e324)
 and much more....
 
-### Run app
+### Run app (npm)
 ```bash
 npm install -g polymer-cli
 ```
