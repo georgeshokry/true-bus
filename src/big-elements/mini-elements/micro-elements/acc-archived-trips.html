@@ -1,0 +1,525 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+
+<link rel="import" href="print-selected-acc.html">
+
+<dom-module id="acc-archived-trips">
+  <template>
+    <style include="granite-bootstrap">
+      *{
+        font-family: GESS-Light;
+      }
+      a{
+        text-decoration: none !important;
+      }
+      #divMainAcc{
+        color: #016064;
+        font-size: 25px;
+      }
+      .changeFont{
+        font-family: sans-serif !important;
+      }
+      .accImg{
+        width: 120px;
+      }
+      #pageName{
+        margin: 0;
+      }
+      .row{
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-flex-wrap: wrap;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+      }
+      .removePadding{
+        padding: 0;
+      }
+      .correctDir{
+        float: right !important;
+        height: 100%;
+        align-self: flex-end !important;
+      }
+      .leftSide{
+        width: 200px;
+      }
+      .leftSide p{
+        margin-top: 5px;
+      }
+      .addAccBtn{
+        bottom: 5px;
+        width: 48px;
+        height: 48px;
+        color: #EABC00;
+      }
+      @media (min-width: 992px) {
+        .accImg{
+          float: left;
+        }
+      }
+      @media (max-width: 711) {
+        .leftSide{
+          margin-right: 200px !important;
+        }
+      }
+      @media (max-width: 767px) {
+        .leftSide{
+          margin-top: 30px;
+        }
+      }
+      .whichTrips{
+        background-color: #f0f0f0;
+        color: #016064;
+        font-size: 13px;
+      }
+      paper-button.whichTrips:hover {
+        background-color: #62B7A7;
+      }
+      .activeBtn {
+        background-color: #016064;
+        color: white;
+      }
+      .tripsCard{
+        width: 350px;
+        --paper-card:{
+          margin: 10px 30px 10px 10px;
+          -webkit-transition: background-color 500ms ease;
+          -ms-transition: background-color 500ms ease;
+          transition: background-color 500ms ease;
+        }
+      }
+      .tripsCard:hover{
+        background-color: #62B7A7;
+        cursor: pointer;
+      }
+      .tripsCard p{
+        font-size: 18px;
+        padding: 10px;
+        margin: 0;
+      }
+      .tripsCard p:first-child{
+        float: right;
+      }
+      .tripsCard p:last-child{
+        float: left;
+      }
+      @media (max-width: 640px) {
+        .tripsCard{
+          width: 90%;
+        }
+        .trip-div{
+          width: 100% !important;
+        }
+      }
+      .results{
+        font-size: 18px;
+      }
+      .res{
+        width: 100%;
+      }
+      .res p{
+        display: inline-block;
+      }
+      .res p:first-child{
+        width: 150px;
+      }
+      .res p:last-child{
+        min-width: 100px;
+      }
+      .accBtns{
+        background-color: #016064;
+        color: #EABD00;
+        font-size: 18px;
+        margin: 10px;
+      }
+      .accNameDiv{
+        text-align: center;
+        width: 100%;
+      }
+      .accNameDiv p {
+        display: inline-block;
+      }
+      #accNowTName{
+        color: #EABD00;
+        margin-right: 10px;
+      }
+      .trip-div{
+        position: relative;
+        width: 390px;
+        display: inline-block;
+      }
+      .trips-checkbox{
+        position: absolute;
+        top: 35px;
+      }
+      .trip-checked{
+        background-color: #EABD00 !important;
+      }
+      .trip-checked:hover{
+        background-color: #F0D04C !important;
+      }
+      .page-bottom-btns{
+        background-color: #EABC00;
+        color: #016064;
+        padding: 5px 0;
+        font-size: 18px;
+      }
+      @media print {
+        body{
+          margin: 0;
+        }
+        #divMainAcc *{
+          visibility: hidden;
+        }
+        #accNow1{
+          position: absolute;
+          top: 0;
+          right: 30px;
+        }
+        #accNow1, #accNow1 * {
+          visibility: visible !important;
+        }
+        .accBtns{
+          display: none;
+        }
+        #addOthersBtn1{
+          display: none;
+        }
+      }
+
+    </style>
+
+    <div id="divMainAcc">
+      <div class="row" style="margin-bottom: 30px;">
+        <div class="correctDir col-lg-2 col-md-2 col-sm-3 col-xs-7">
+          <img class="accImg" src="/images/png/2-01.png">
+        </div>
+        <div class="correctDir col-lg-6 col-md-6 col-sm-4 col-xs-5">
+          <p id="pageName">الحسابات</p>
+        </div>
+      </div>
+      <div id="ifNotMainResutlsArch">
+        <div id="tripsAccArchived" class="tripsAcc">
+          <template is="dom-repeat" items="{{archivedTrips}}" as="trip">
+            <div class="trip-div">
+              <paper-checkbox on-change="checkboxTabed" class="trips-checkbox"></paper-checkbox>
+              <paper-card class="tripsCard" on-click="accForOneTrip">
+                <p>[[trip.name]]</p>
+                <p class="changeFont">[[trip.date]]</p>
+              </paper-card>
+            </div>
+          </template>
+          <div style="text-align: left; padding: 15px;">
+            <paper-dropdown-menu id="selectAction" label="Select Action" vertical-align="bottom" horizontal-align="right">
+              <paper-listbox slot="dropdown-content">
+                <paper-item>أحسب</paper-item>
+              </paper-listbox>
+            </paper-dropdown-menu>
+            <paper-button class="page-bottom-btns" raised on-click="makeAction">تم</paper-button>
+            <paper-button class="page-bottom-btns" raised onclick="window.history.back();">رجوع</paper-button>
+          </div>
+        </div>
+      </div>
+      <print-selected-acc id="printSelectedAccArch"></print-selected-acc>
+      <div id="accNow1">
+        <div class="row">
+          <div class="col-lg-12 accNameDiv">
+            <p>أسم الرحلة:</p><p id="accNowTName1"></p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4" id="inputsDiv1">
+            <paper-input id="gas1" allowed-pattern="[0-9]" label="البنزين"></paper-input>
+            <paper-input id="driver1" allowed-pattern="[0-9]" label="اجرة السائق"></paper-input>
+            <paper-input id="bus1" allowed-pattern="[0-9]" label="حجز الاتوبيس"></paper-input>
+            <paper-input id="reservation1" allowed-pattern="[0-9]" label="حجز الاماكن السياحية"></paper-input>
+            <p style="font-size: 22px; display: inline-block; margin: 20px 0px;">اخرى</p>
+            <paper-icon-button id="addOthersBtn1" class="addOthersBtn" icon="add-box" onclick="AccArchivedTrips.addOthers()"></paper-icon-button>
+            <div id="others1">
+            </div>
+          </div>
+          <div class="col-md-8 results">
+            <div class="res">
+              <p>اجمالى المصروفات:</p><p id="result11" class="changeFont"></p>
+            </div>
+            <div class="res">
+              <p>اجمالى الايرادات:</p><p id="result21" class="changeFont"></p>
+            </div>
+            <div class="res">
+              <p>صافى الربح:</p><p id="result31" class="changeFont"></p>
+            </div>
+          </div>
+        </div>
+
+        <paper-button class="accBtns" raised onclick="AccArchivedTrips.calcData()">احسب</paper-button>
+        <paper-button class="accBtns" raised onclick="AccArchivedTrips.addAccData()">اضافة الحسابات</paper-button>
+        <paper-button class="accBtns" raised onclick="AccArchivedTrips.printAccData()">طباعة</paper-button>
+        <paper-button class="accBtns" raised onclick="AccArchivedTrips.cancelCalcData()">رجوع</paper-button>
+      </div>
+    </div>
+  </template>
+  <script>
+
+    var accArchTripsMultiSelectObj = {};
+    var ifNotMainResutlsArch, printSelectedAccArch;
+    var tripsAccArchived;
+    var accNow1, inputsDiv1, others1;
+    var gas1, driver1, bus1, reservation1;
+    var otherInputs1 = [];
+    var result11, result21, result31;
+    var driverV1, gasV1, busV1, reservationV1;
+    var accNowTName1;
+    var trIdNow1;
+
+
+    class AccArchivedTrips extends Polymer.Element {
+        static get is() { return 'acc-archived-trips'; }
+        static get properties() {
+            return {
+              archivedTrips:{
+                type: Array,
+              },
+            };
+        }
+        ready(){
+          super.ready();
+          accNow1 = this.$.accNow1;
+          inputsDiv1 = this.$.inputsDiv1;
+          others1 = this.$.others1;
+          gas1 = this.$.gas1;
+          driver1 = this.$.driver1;
+          bus1 = this.$.bus1;
+          reservation1 = this.$.reservation1;
+          result11 = this.$.result11;
+          result21 = this.$.result21;
+          result31 = this.$.result31;
+          accNowTName1 = this.$.accNowTName1;
+
+
+          ifNotMainResutlsArch = this.$.ifNotMainResutlsArch;
+          printSelectedAccArch = this.$.printSelectedAccArch;
+          tripsAccArchived = this.$.tripsAccArchived;
+
+          //hide accNow1
+          accNow1.style.display = 'none';
+
+          //hide selected acc table
+          printSelectedAccArch.style.display = 'none';
+
+          getArchivedAccTrips((tripsData) => {
+            this.archivedTrips = tripsData;
+          });
+        }
+        checkboxTabed(e){
+          var checked = e.model.children[1].children[0].checked;
+          var paperCard = e.model.children[1].children[1];
+          var tripId = e.model.__data.trip.idOfTrip;
+
+          if(checked){
+            accArchTripsMultiSelectObj[tripId] = {};
+            paperCard.classList.add('trip-checked');
+          }else {
+            delete accArchTripsMultiSelectObj[tripId]
+            paperCard.classList.remove('trip-checked');
+          }
+        }
+        makeAction(e){
+          var selected = e.path[1].children[0].children[0].selected;
+          var mainArchTrips = e.path[2].children;
+
+          if(!isEmpty(accArchTripsMultiSelectObj)){
+            if(selected === 0){
+              calArchivedAccData(accArchTripsMultiSelectObj, (assignOut) => {
+                ifNotMainResutlsArch.style.display = 'none';
+                printSelectedAccArch.style.display = 'block';
+
+                printSelectedAccArch.printed_obj = assignOut;
+                this.clearChecked();
+              });
+            }
+          }
+
+          //check if object is empty
+          function isEmpty(obj) {
+            for(var prop in obj) {
+              if(obj.hasOwnProperty(prop))
+              return false;
+            }
+            return JSON.stringify(obj) === JSON.stringify({});
+          }
+        }
+
+        clearChecked(){
+          var mainTripsAccDiv = tripsAccArchived.children;
+
+          if(mainTripsAccDiv.length > 2){
+            // length-2 to ignore dom-repeat and last div of dropdown
+            for(let i = 0; i < mainTripsAccDiv.length-2; i++){
+              mainTripsAccDiv[i].children[0].checked = false;
+              mainTripsAccDiv[i].children[1].classList.remove('trip-checked');
+            }
+            accArchTripsMultiSelectObj = {};
+          }
+        }
+
+        accForOneTrip(e){
+          var tripId = e.model.__data.trip.idOfTrip;
+          var tripName = e.model.__data.trip.name;
+
+          accNowTName1.innerHTML = tripName;
+          others1.innerHTML = '';
+          bus1.value = '';
+          driver1.value = '';
+          gas1.value = '';
+          reservation1.value = '';
+          otherInputs1 = [];
+          trIdNow1 = tripId;
+
+          getAccData(tripId, function(assignData){
+            console.log(assignData);
+              ifNotMainResutlsArch.style.display = "none";
+              accNow1.style.display = 'block';
+
+              if(assignData != null){
+                  assignData.forEach((elm) => {
+                      for (var i in elm){
+                          if(i == 'bus'){
+                              bus1.value = elm[i];
+                          }else if (i == 'gas'){
+                              gas1.value = elm[i];
+                          }else if(i == 'driver'){
+                              driver1.value = elm[i];
+                          }else if(i == 'reservation'){
+                              reservation1.value = elm[i];
+                          }else{
+                              var div = '';
+                              var paperInputLabel = '';
+                              var paperInput = '';
+                              div = document.createElement('div');
+                              paperInputLabel = document.createElement('paper-input');
+                              paperInputLabel.setAttribute('auto-validate', '');
+                              paperInputLabel.setAttribute('required', '');
+                              paperInputLabel.setAttribute('error-message', 'مطلوب');
+                              paperInputLabel.value = i;
+                              paperInputLabel.style.display = 'inline-block';
+                              paperInputLabel.style.width = '50%';
+                              paperInput = document.createElement('paper-input');
+                              paperInput.setAttribute('allowed-pattern', '[0-9]');
+                              paperInput.value = elm[i];
+                              paperInput.style.display = 'inline-block';
+                              paperInput.style.width = '50%';
+                              div.style.display = 'block'
+                              others1.appendChild(div);
+                              div.appendChild(paperInputLabel);
+                              div.appendChild(paperInput);
+
+                              otherInputs1.push([paperInputLabel, paperInput]);
+                          }
+                      }
+                  })
+              }
+          });
+        }
+
+        // add others1 to calc or add them to db
+        static addOthers(){
+            var div = document.createElement('div');
+            var paperInputLabel = document.createElement('paper-input');
+            paperInputLabel.style.display = 'inline-block';
+            paperInputLabel.setAttribute('auto-validate', '');
+            paperInputLabel.setAttribute('required', '');
+            paperInputLabel.setAttribute('error-message', 'مطلوب');
+            paperInputLabel.style.width = '50%';
+            var paperInput = document.createElement('paper-input');
+            paperInput.setAttribute('allowed-pattern', '[0-9]');
+            paperInput.style.display = 'inline-block';
+            paperInput.style.width = '50%';
+            div.style.display = 'block';
+
+            others1.appendChild(div);
+            div.appendChild(paperInputLabel);
+            div.appendChild(paperInput);
+
+            otherInputs1.push([paperInputLabel, paperInput]);
+        }
+        //calc data
+        static calcData(){
+            result11.innerHTML = '';
+            result21.innerHTML = '';
+            result31.innerHTML = '';
+
+            var objOfOthers = {};
+            AccArchivedTrips.calcAndAdd(objOfOthers);
+
+            calAccData(trIdNow1, driverV1, reservationV1, gasV1, busV1, objOfOthers, function(assignCalData){
+              console.log(assignCalData);
+              result11.innerHTML = assignCalData[0].totalCosts;
+              result21.innerHTML = assignCalData[0].totalRevenue;
+              result31.innerHTML = assignCalData[0].totalInterest;
+            })
+        }
+        static addAccData(){
+            var obj = {};
+            AccArchivedTrips.calcAndAdd(obj);
+            obj['gas'] = gasV1;
+            obj['driver'] = driverV1;
+            obj['reservation'] = reservationV1;
+            obj['bus'] = busV1;
+
+            addAccData(trIdNow1, obj, function(assignLogMsg){
+                context.set('errorMsg', assignLogMsg);
+            });
+        }
+        // function for both calc and add data
+        static calcAndAdd(obj){
+          console.log(obj);
+            otherInputs1.forEach((elm) => {
+                for (var i in elm){
+                    if(isNaN(parseInt(elm[1].value)) == false) {
+                        if(elm[0].value == undefined || elm[0].value.trim() == ""){
+                            elm[0].validate();
+                            elm[0].value = '';
+                        }else{
+                            obj[elm[0].value] = parseInt(elm[1].value);
+                        }
+                    }
+                }
+            });
+
+            driverV1 = parseInt(driver1.value);
+            reservationV1 = parseInt(reservation1.value);
+            gasV1 = parseInt(gas1.value);
+            busV1 = parseInt(bus1.value);
+
+            if(isNaN(driverV1)){
+                driverV1 = 0;
+            }
+            if(isNaN(reservationV1)){
+                reservationV1 = 0;
+            }
+            if (isNaN(gasV1)){
+                gasV1 = 0;
+            }
+            if(isNaN(busV1)){
+                busV1 = 0;
+            }
+        }
+        static cancelCalcData(){
+            result11.innerHTML = '';
+            result21.innerHTML = '';
+            result31.innerHTML = '';
+
+            ifNotMainResutlsArch.style.display = "block";
+            accNow1.style.display = 'none';
+        }
+
+        static printAccData(){
+          window.print();
+        }
+
+
+      }
+    window.customElements.define(AccArchivedTrips.is, AccArchivedTrips);
+  </script>
+</dom-module>

@@ -1,0 +1,233 @@
+<!-- <link rel="import" href="../../bower_components/polymer/polymer-element.html"> -->
+<link rel="import" href="../../bower_components/polymer/lib/legacy/class.html">
+
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+
+<script src="../../services/auth.js"></script>
+
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
+
+<dom-module id="signin-element">
+  <template>
+    <style>
+      :host {
+        display: block;
+        --paper-input-container-label: {
+          font-family: GESS-Light;
+        };
+
+      }
+      *{
+          font-family: GESS-Light;
+      }
+      .signinDiv{
+        width: 100%;
+        height: 100%;
+        color: #016064;
+        background-color: #006064;
+        z-index: 1;
+      }
+      .imgDiv{
+        width: 100%;
+        text-align: center;
+      }
+      .windBg{
+        max-width: 540px;
+        height: 300px;
+      }
+      paper-card{
+        margin: 0 auto;
+        @apply(--layout-vertical);
+        width: 40%;
+      }
+      .aboveForm{
+        height: 20px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        text-align: center;
+      }
+      .aboveForm p{
+        margin: 0;
+        padding: 0;
+        font-size: 16px;
+      }
+      .formDiv{
+        width: 100%;
+        background-color: #EAEAEA;
+      }
+      .signinForm{
+        padding: 20px 20px 35px 20px;
+        min-height: 160px;
+      }
+      paper-input{
+        --paper-input-container-color: #016064;
+        --paper-input-container-input-color: #016064;
+      }
+
+      iron-icon{
+          margin-left: 10px;
+      }
+      paper-button{
+        margin-top: 20px;
+        float: left;
+      }
+      @media (max-width: 950px) {
+        paper-card{
+          width: 60%;
+        }
+      }
+      @media (max-width: 550px) {
+        paper-card{
+          width: 90%;
+        }
+      }
+
+      #toastWarning {
+        text-align: center;
+        --paper-toast-background-color: red;
+        --paper-toast-color: white;
+      }
+
+    </style>
+    <div class="signinDiv">
+      <div class="imgDiv">
+        <img src="../../images/png/logo-sign-in-02.png" class="windBg">
+      </div>
+      <paper-card>
+        <div class="aboveForm">
+          <p>الدخول</p>
+        </div>
+        <div class="formDiv">
+          <iron-form method="get">
+            <form  method="get" class="signinForm">
+                <paper-input id="mail" onkeydown="SigninElement.submit(event);" value="{{mail}}" type="email" label="الايميل"  required auto-validate  error-message="{{errMsgEmail}}">
+                  <iron-icon icon="mail" slot="prefix"></iron-icon>
+                </paper-input>
+                <paper-input id="password" onkeydown="SigninElement.submit(event);" value="{{password}}"  type="password" label="كلمة السر" required auto-validate error-message="{{errMsgPass}}">
+                  <iron-icon icon="https" slot="prefix"></iron-icon>
+                </paper-input>
+                <paper-button type="submit" raised onclick="SigninElement.signinUser();">دخول</paper-button>
+            </form>
+          </iron-form>
+        </div>
+      </paper-card>
+      <paper-toast id="toastWarning" class="fit-bottom" duration="0" text="خطأ, يرجى التأكد من الاتصال بالانترنت "></paper-toast>
+      <paper-toast id="signinToast"  text=""></paper-toast>
+      <paper-toast id="loadingToast"  text=""></paper-toast>
+    </div>
+  </template>
+
+  <script>
+    var e = "";
+    var p = "";
+    var mail;
+    var signinToast = "";
+    var toastWarning;
+    var secondCall = true;
+    var loadingToast;
+
+    class SigninElement extends Polymer.Element {
+      static get is() { return 'signin-element'; }
+      static get properties() {
+        return {
+          prop1: {
+            type: String,
+            value: 'signin-element'
+          },
+          errMsgEmail: {
+            type: String,
+            value: 'الايميل مطلوب',
+              notify: true
+          },
+          errMsgPass: {
+            type: String,
+            value: 'كلمة السر مطلوبة',
+              notify: true
+          }
+        };
+      }
+      ready(){
+        super.ready();
+        context = this;
+        mail = this.$.mail;
+        signinToast = this.$.signinToast;
+        toastWarning = this.$.toastWarning;
+          loadingToast = this.$.loadingToast;
+
+        e = this.$.mail;
+        p = this.$.password;
+// Add event listener offline to detect network loss.
+          window.addEventListener("offline", function(e) {
+              HaloDashboard.checkConn(false);
+          });
+
+// Add event listener online to detect network recovery.
+          window.addEventListener("online", function(e) {
+              HaloDashboard.checkConn(true);
+          });
+      }
+
+        static submit(event){
+            var enter = 13;
+
+            if (event.keyCode === enter) {
+                SigninElement.signinUser();
+            }
+      }
+      static signinUser() {
+
+
+          e.validate();
+          p.validate();
+
+          if (e.value !== undefined && p.value !== undefined) {
+
+              signInUser(e.value, p.value, function (assignUserStat) {
+
+                  if (assignUserStat == 'auth/user-not-found') {
+                      mail.validate();
+                      mail.value = "";
+
+                      signinToast.text = "خطأ فى الايميل, حاول مرة اخرى";
+                      signinToast.open();
+
+                      context.set('errMsgEmail', 'خطأ فى الايميل, حاول مرة اخرى');
+                      signinToast.text = "خطأ فى الايميل, حاول مرة اخرى";
+                      signinToast.open();
+                  } else if (assignUserStat == 'auth/wrong-password') {
+                      console.log(mail);
+                      p.value = "";
+                      context.set('errMsgPass', 'خطأ فى كلمة السر, حاول مرة اخرى');
+                      signinToast.text = "خطأ فى كلمة السر, حاول مرة اخرى";
+                      signinToast.open();
+
+                  }else {
+                      loadingToast.text = "جار التحميل ...";
+                      loadingToast.open();
+
+                      getSignedUser(function (assign) {
+                          loadingToast.text = "جار التحميل ...";
+                          loadingToast.open();
+                          console.log(assign);
+                          if (assign != null) {
+                              window.location.href = "/#/"
+                          } else {
+                          }
+
+                      });
+                  }
+
+
+              });
+
+          }
+      }
+
+    }
+
+    window.customElements.define(SigninElement.is, SigninElement);
+  </script>
+</dom-module>

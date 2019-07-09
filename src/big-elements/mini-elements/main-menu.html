@@ -1,0 +1,57 @@
+<!-- <link rel="import" href="../../../bower_components/polymer/polymer-element.html"> -->
+<link rel="import" href="../../../bower_components/polymer/lib/legacy/class.html">
+
+<link rel="import" href="micro-elements/dashboard-card.html">
+
+<dom-module id="main-menu">
+    <template>
+        <style include="app-grid-style">
+            :host {
+                --app-grid-columns: 1;
+            }.item {
+                 max-width: 80%;
+             }
+            @media screen and (min-width: 768px){
+
+                .item {
+                    padding: 40px;
+                    max-width: 33.3%;
+
+                }
+            }
+            #ulContent{
+              padding: 0;
+                margin-top: 0;
+            }
+        </style>
+        <div id="divMain">
+            <ul id="ulContent" class="app-grid">
+
+                <template is="dom-repeat" items="{{cards}}">
+                      <dashboard-card class="item" image_url="{{item.url}}"
+                      title="{{item.title}}" link="{{item.link}}"></dashboard-card>
+                </template>
+            </ul>
+        </div>
+    </template>
+
+    <script>
+        /**
+         * @customElement
+         * @polymer
+         */
+        class MainMenu extends Polymer.Element {
+            static get is() { return 'main-menu'; }
+            static get properties() {
+                return {
+                    cards: {
+                        type: Array,
+                        value: []
+                    }
+                };
+            }
+        }
+
+        window.customElements.define(MainMenu.is, MainMenu);
+    </script>
+</dom-module>

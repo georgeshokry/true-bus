@@ -1,0 +1,229 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../../bower_components/paper-toast/paper-toast.html">
+<script src="../../../../services/trips-services.js"></script>
+<dom-module id="archived-trips">
+  <template>
+    <style include="granite-bootstrap">
+      *{
+        font-family: GESS-Light;
+      }
+
+      .changeFont{
+        font-family: sans-serif !important;
+      }
+      .tripImg{
+        width: 120px;
+      }
+      .tripsTable{
+        font-size: 14px;
+        font-weight: lighter;
+        width: 100%;
+        position: relative;
+      }
+      .tableScroller{
+      //margin-right: 100px;
+        overflow-x: scroll;
+      }
+      table{
+        text-align: center !important;
+      }
+      th{
+        text-align: center !important;
+        color: #97BEC0;
+      }
+      .stickyCol{
+        right: 0;
+        top: auto;
+      //position: sticky;
+        max-width: 100px;
+        height: 46px;
+        background-color: #F9F9F9;
+      }
+      .row{
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-flex-wrap: wrap;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+      }
+      .correctDir{
+        float: right !important;
+        height: 100%;
+        align-self: flex-end !important;
+      }
+      th, td{
+        padding-bottom: 10px !important;
+        padding-top: 10px !important;
+        background-color: white;
+        word-wrap: break-word;
+        min-width: 140px;
+      }
+      tr{
+        -webkit-transition: background-color 500ms ease;
+        -ms-transition: background-color 500ms ease;
+        transition: background-color 500ms ease;
+      }
+      .removePadding{
+        padding: 0;
+      }
+      .formBtn{
+        color: #EABC00;
+        background-color: #016064;
+        padding: 5px 0 5px 0;
+        font-size: 16px;
+        font-weight: bold;
+      }
+      .archived-trips{
+        background-color: #016064;
+        color: white;
+        font-size: 13px;
+      }
+      a {
+        text-decoration: none !important;
+      }
+      paper-button.archived-trips:hover {
+        color: black;
+        background-color: #62B7A7;
+      }
+      .page-bottom-btns{
+        background-color: #EABC00;
+        color: #016064;
+        padding: 5px 0;
+        font-size: 18px;
+      }
+
+      .reserveTicket{
+        background-color: #016064;
+        color: #EABC00;
+        padding: 0;
+        font-size: 18px;
+      }
+      .firstCol{
+        min-width: 100px;
+        white-space: pre-wrap;
+      }
+      tr:nth-child(odd) td{background-color: #ddd !important}
+      .buttons paper-button {
+        color: #016064;
+        font-size: 18px;
+      }
+
+    </style>
+    <div id="divMainTrips">
+      <div class="row" style="margin-bottom: 30px;">
+        <div class="correctDir col-lg-2 col-md-2 col-sm-3 col-xs-7">
+          <img class="tripImg" src="/images/png/4-01.png">
+        </div>
+        <div class="correctDir col-lg-7 col-md-7 col-sm-4 col-xs-5">
+          <p id="pageName">الرحلات المؤرشفة</p>
+        </div>
+      </div>
+      <div style="text-align: left; margin: 10px;">
+        <a href="#/trips">
+          <paper-button class="archived-trips">الرحلات الحالية</paper-button>
+        </a>
+      </div>
+      <div id="tripsTableDiv" class="tripsTable">
+        <div class="tableScroller">
+          <table class="table" id="table">
+            <tbody>
+            <tr>
+              <th class="stickyCol" style="width: 100%">اسم الرحلة</th><th>التاريخ</th><th>الوقت</th><th>من</th>
+              <th>إلى</th><th>مدة الرحلة</th><th>السعر</th><th></th><th></th>
+            </tr>
+            <template id="repeatedT" is="dom-repeat" items="{{archivedTrips}}" as="trip">
+              <tr>
+                <td class="stickyCol firstCol">{{trip.name}}</td>
+                <td class="changeFont">{{trip.date}}</td>
+                <td class="changeFont">{{trip.time}}</td>
+                <td>{{trip.from}}</td>
+                <td>{{trip.to}}</td>
+                <td>{{trip.duration}}</td>
+                <td class="changeFont">{{trip.price}}</td>
+                <td>
+                  <a href="#/ticket-tabel/[[trip.idOfTrip]]">
+                    <paper-button class="formBrn reserveTicket" raised>كشف</paper-button>
+                  </a>
+                </td>
+                <td>
+                  <paper-button class="formBrn reserveTicket" style="background-color: red; color: white" on-click="deleteTripArc" raised>حذف</paper-button>
+                </td>
+
+
+                <!-- <td>
+                  <paper-checkbox on-tap="checkboxTabed"></paper-checkbox>
+                </td> -->
+              </tr>
+            </template>
+            </tbody>
+          </table>
+        </div>
+        <div style="text-align: left; padding: 15px;">
+          <!-- <paper-button class="page-bottom-btns" raised on-click="archiveTrips">أرشفة</paper-button> -->
+          <paper-button class="page-bottom-btns" raised onclick="window.history.back();">رجوع</paper-button>
+        </div>
+      </div>
+    </div>
+    <!--dialoge for deleting-->
+    <paper-dialog id="confirmDialogArc" with-backdrop style="width: 300px;  direction: rtl;" >
+      <h4 style="text-align: center; margin-top: 30px;" >هل تريد بالفعل حذف رحلة <span id="tripNameViewArc" style="color: red"></span>؟</h4>
+      <h5 style="color: red;text-align: right;" >تأكد ان الرحلة بدون حسابات و تذاكر*</h5>
+      <!--<hr style="background-color: #21CE41; width: 90px; align-items: center">-->
+      <br>
+      <div class="buttons" style="direction: rtl">
+        <paper-button style="background-color: red; color:  #EABC00" on-click="deleteTripNowArc" dialog-confirm>نعم</paper-button>
+        <paper-button style="background-color: #016064;; color:  #EABC00" dialog-dismiss >لا</paper-button>
+
+
+      </div>
+    </paper-dialog>
+
+    <paper-toast id="toastSuccArc" text=""></paper-toast>
+  </template>
+
+    <script>
+var idToDeleteArc ;
+var toastSuccArc;
+var confirmDialogArc;
+var tripNameViewArc;
+        class ArchivedTrips extends Polymer.Element {
+            static get is() { return 'archived-trips'; }
+            static get properties() {
+                return {
+                    archivedTrips: {
+                        type: Array,
+                    }
+                };
+            }
+            ready(){
+                super.ready();
+                toastSuccArc = this.$.toastSuccArc;
+                confirmDialogArc = this.$.confirmDialogArc;
+                tripNameViewArc = this.$.tripNameViewArc;
+
+                getArchivedTrips((tripData) =>{
+                    this.set('archivedTrips', tripData);
+                console.log(this.archivedTrips);
+            });
+            }
+            deleteTripArc(e){
+                idToDeleteArc = e.model.trip.idOfTrip;
+                tripNameViewArc.innerHTML = e.model.trip.name;
+                confirmDialogArc.open();
+            }
+
+            deleteTripNowArc(){
+
+                deleteTrip(idToDeleteArc, function (assignLogMsg) {
+                    toastSuccArc.text = assignLogMsg;
+                    toastSuccArc.open();
+                    idToDeleteArc = '';
+                });
+            }
+        }
+
+        window.customElements.define(ArchivedTrips.is, ArchivedTrips);
+    </script>
+</dom-module>

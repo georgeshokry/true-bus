@@ -1,0 +1,1058 @@
+<!-- <link rel="import" href="../../../../bower_components/polymer/polymer-element.html"> -->
+<link rel="import" href="../../../../bower_components/polymer/lib/legacy/class.html">
+
+<link rel="import" href="../../../../bower_components/paper-toast/paper-toast.html">
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<script src="../../../../services/trips-services.js"></script>
+<script src="../../../../services/tickets-services.js"></script>
+
+<dom-module id="trips-element">
+  <template>
+    <style include="granite-bootstrap">
+      *{
+        font-family: GESS-Light;
+      }
+      #divMainTrips{
+        color: #016064;
+        font-size: 25px;
+      }
+      .changeFont{
+        font-family: sans-serif !important;
+      }
+      .tripImg{
+        width: 120px;
+      }
+      .tripsTable{
+        font-size: 14px;
+        font-weight: lighter;
+        width: 100%;
+        position: relative;
+      }
+      .tableScroller{
+      // margin-right: 100px;
+        overflow-x: scroll;
+      }
+      table{
+        text-align: center !important;
+      }
+      th{
+        text-align: center !important;
+        color: #97BEC0;
+      }
+      .stickyCol{
+        right: 0;
+        top: auto;
+        max-width: 100px;
+        height: 46px;
+        background-color: #F9F9F9;
+      //position: sticky;
+      }
+      .row{
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-flex-wrap: wrap;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+      }
+      .correctDir{
+        float: right !important;
+        height: 100%;
+        align-self: flex-end !important;
+      }
+      .leftSide p{
+        margin-top: 5px;
+      }
+      .addTripBtn{
+        bottom: 5px;
+        width: 48px;
+        height: 48px;
+        color: #EABC00;
+      }
+      th, td{
+        padding-bottom: 10px !important;
+        padding-top: 10px !important;
+        background-color: white;
+        word-wrap: break-word;
+        min-width: 110px;
+      }
+
+      tr{
+        -webkit-transition: background-color 500ms ease;
+        -ms-transition: background-color 500ms ease;
+        transition: background-color 500ms ease;
+      }
+      .removePadding{
+        padding: 0;
+      }
+      .formBtn{
+        color: #EABC00;
+        background-color: #016064;
+        padding: 5px 0 5px 0;
+        font-size: 16px;
+        font-weight: bold;
+      }
+      .createTripDiv{
+        text-align: center;
+        font-size: 14px;
+      }
+      .createTripDiv div{
+        margin-bottom: 15px;
+      }
+      .createTripDiv label{
+        width: 5%;
+        min-width: 75px;
+        text-align: right;
+        margin-left: 20px;
+      }
+      .createTripDiv input, .createTripDiv select, .createTripDiv paper-button {
+        width: 25%;
+        min-width: 200px;
+      }
+      .createTripDiv input, .createTripDiv select {
+        box-shadow: 0 0 3px gray;
+        border: 0;
+        height: 25px;
+      }
+      .createTripDiv input{
+        padding-right: 5px;
+      }
+      .createTripDiv paper-button{
+        color:  white;
+        font-size: 23px;
+        font-weight: 400;
+      }
+      .durationDiv{
+        display: inline-block;
+      }
+      .durationDiv input, .durationDiv select{
+        display: block;
+      }
+      .timePickerMobile{
+        padding: 0;
+        margin-top: 40px;
+      }
+      #dialog{
+        top: 70px;
+      }
+      .paperDialogMobile{
+        top: 25px !important;
+        max-width: 700px;
+        max-height: 520px;
+      }
+      paper-dialog paper-button{
+        background-color: #016064;
+        color: #EBBD00 !important;
+      }
+      @media (max-width: 711) {
+        .leftSide{
+          margin-right: 200px !important;
+        }
+      }
+      @media (min-width: 992px) {
+        .tripImg{
+          float: left;
+        }
+      }
+      @media (max-width: 717px) {
+        .leftSide{
+          margin-top: 30px;
+        }
+      }
+      .paper-time-picker-dialog{
+        z-index: 1000;
+      }
+      paper-dialog{
+        direction: ltr;
+      }
+      .buttons paper-button {
+        color: #016064;
+        font-size: 18px;
+      }
+      .reserveTicket{
+        background-color: #016064;
+        color: #EABC00;
+        padding: 0;
+        font-size: 18px;
+      }
+      .clientDetails{
+        margin: 40px auto;
+        width: 70%;
+        padding: 20px;
+        background-color: white;
+        border-radius: 2%;
+      }
+      @media (max-width: 450px) {
+        .clientDetails{
+          width: 100%;
+        }
+      }
+      .reservBtns{
+        text-align: center;
+      }
+      .seats{
+        margin: 0 auto;
+        width: 260px;
+        min-height: 150px;
+        max-height: 70vw;
+        padding: 10px;
+        background-color: white;
+        border-radius: 2%;
+        -webkit-transform: translateY(-20%) rotate(90deg);
+        -moz-transform: translateY(-20%) rotate(90deg);
+        -ms-transform: translateY(-20%) rotate(90deg);
+        -o-transform: translateY(-20%) rotate(90deg);
+        transform: translateY(30%) rotate(90deg);
+        overflow-y: scroll;
+      }
+      .seatsMobile{
+        margin: 0 auto;
+        /*width: 250px;*/
+        min-height: 260px;
+        background-color: white;
+        border-radius: 2%;
+      }
+      .seatIcon{
+        -webkit-transform: rotate(180deg);
+        -moz-transform: rotate(180deg);
+        -ms-transform: rotate(180deg);
+        -o-transform: rotate(180deg);
+        transform: rotate(180deg);
+        --iron-icon-width: 40px;
+        --iron-icon-height: 50px;
+      }
+      .printTickets{
+        width: 100%;
+        overflow-x: scroll;
+        overflow-y: hidden;
+      }
+      .printedTicket{
+        margin: 10px auto;
+        background-color: #016064;
+        width: 610px;
+        height: 300px;
+        color: white;
+        overflow: hidden;
+      }
+      .printedTicket{
+        page-break-before: always;
+      }
+      .printedRightSide{
+        font-size: 13px;
+        padding-right: 30px;
+        padding-top: 20px;
+      }
+      .printedLogoDiv{
+        margin-bottom: 20px;
+      }
+      .printedSeatNum{
+        position: relative;
+      }
+      .printedSeatNum p{
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 100%;
+        margin: 0;
+        color: white !important;
+      }
+      .printedSeatNum p span{
+        margin-right: 10px;
+        color: #eabd00 !important;
+      }
+      .allDetails{
+        display: table-row;
+        width: 100%;
+      }
+      .allDetails p{
+        display: table-cell;
+        width: 320px;
+      }
+      .allDetails p:last-child, .allDetails p span{
+        color: #eabd00 !important;
+      }
+      .printedTicketDetailsRight{
+        border: 1px solid #358185;
+        height: 190px;
+        width: 270px;
+        overflow-y: hidden;
+      }
+      .printedRightSide, .printedLeftSide{
+        display: table;
+      }
+      .printedRightSide{
+        height: 300px;
+        border-left: 2px dashed white !important;
+      }
+      .allDetailsRight p{
+        border-bottom: 1px solid #358185;
+        padding: 15px;
+      }
+      .allDetailsRight p:first-child{
+        width: 80px;
+      }
+      .printedLeftSide{
+        font-size: 10px;
+        margin-top: 50px;
+      }
+      .allDetailsCenter p{
+        padding: 5px;
+      }
+      .allDetailsCenter p:first-child{
+        width: 120px;
+      }
+      .printedTime{
+        margin-right: 40px;
+      }
+      .ticketLogo{
+        width: 100%;
+      }
+      .ticketLeftImg{
+        width: 100%;
+      }
+      .printBtns{
+        margin: 10px auto;
+        text-align: left;
+      }
+      @media print {
+        body{
+          margin: 0;
+        }
+        #divMainTrips, #divMainTrips *, app-header, app-drawer-layout{
+          visibility: hidden;
+        }
+        #printTicketsDiv, #printTicketsDiv * {
+          visibility: visible;
+        }
+        #printTicketsDiv {
+          right: 0;
+          top: 0;
+        }
+        .printTickets{
+          overflow-x: hidden !important;
+        }
+        .printedTicket{
+          width: 610px;
+          margin: 0;
+          background-color: #016064 !important;
+        }
+        .printedTicket:first-of-type{
+          position: absolute;
+          top: -120px;
+        }
+        .allDetails p:first-child{
+          color: white !important
+        }
+        #divMainTrips{
+          padding: 0;
+        }
+
+      }
+      #toastWarning {
+        text-align: center;
+        --paper-toast-background-color: red;
+        --paper-toast-color: white;
+      }
+      .archived-trips{
+        background-color: #016064;
+        color: white;
+        font-size: 13px;
+      }
+      a {
+        text-decoration: none !important;
+      }
+      paper-button.archived-trips:hover {
+        color: black;
+        background-color: #62B7A7;
+      }
+      .page-bottom-btns{
+        background-color: #EABC00;
+        color: #016064;
+        padding: 5px 0;
+        font-size: 18px;
+      }
+      .firstCol{
+        min-width: 100px;
+        white-space: pre-wrap;
+      }
+      tr:nth-child(odd) td{background-color: #ddd !important}
+
+      .addtext:after{
+        display: inline-block;
+        position: absolute;
+        top:25%;
+        font-size: 13px;
+        color: #000000;
+        -webkit-transform: translateY(0%) rotate(90deg);
+        -moz-transform: translateY(0%) rotate(90deg);
+        -ms-transform: translateY(0%) rotate(90deg);
+        -o-transform: translateY(0%) rotate(90deg);
+        transform: translateY(0%) rotate(90deg);
+
+      }
+
+
+
+    </style>
+    <div id="divMainTrips">
+      <div class="row" style="margin-bottom: 30px;">
+        <div class="correctDir col-lg-2 col-md-2 col-sm-3 col-xs-7">
+          <img class="tripImg" src="/images/png/4-01.png">
+        </div>
+        <div class="correctDir col-lg-7 col-md-7 col-sm-4 col-xs-5">
+          <p id="pageName">الرحلات</p>
+        </div>
+        <div class="w-100"></div>
+        <div class="correctDir col-lg-3 col-md-3 col-sm-5">
+          <div class="leftSide">
+            <div class="row">
+              <div class="removePadding col-md-9 col-sm-10">
+                <p id="createTripText" style="float:left;">إنشاء رحلة</p>
+              </div>
+              <div class="removePadding col-md-3 col-sm-2 col-xs-2">
+                <paper-icon-button id="addTripBtn" class="addTripBtn" icon="add-box" onclick="TripsElement.addTripDiv(event)"></paper-icon-button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="text-align: left; margin: 10px;">
+        <a href="#/archived-trips/">
+          <paper-button id="archivedTripsBtn" class="archived-trips">الرحلات المؤرشفة</paper-button>
+        </a>
+      </div>
+      <div id="tripsTableDiv" class="tripsTable">
+        <div class="tableScroller">
+          <table class="table" id="table">
+            <tbody>
+            <tr>
+              <th class="stickyCol" style="width: 100%">اسم الرحلة</th><th>التاريخ</th><th>الوقت</th><th>من</th>
+              <th>إلى</th><th>مدة الرحلة</th><th></th><th></th><th></th><th></th><th>السعر</th><th></th>
+            </tr>
+            <template id="repeatedT" is="dom-repeat" items="{{trips}}" as="trip">
+              <tr>
+                <td class="stickyCol firstCol">{{trip.name}}</td>
+                <td class="changeFont">{{trip.date}}</td>
+                <td class="changeFont">{{trip.time}}</td>
+                <td>{{trip.from}}</td>
+                <td>{{trip.to}}</td>
+                <td>{{trip.duration}}</td>
+                <td>
+                  <paper-button class="formBrn reserveTicket" onclick="TripsElement.reserveTkt(event);" raised>حجز</paper-button>
+                </td>
+                <td>
+                  <a href="#/ticket-tabel/[[trip.idOfTrip]]">
+                    <paper-button class="formBrn reserveTicket" raised>كشف</paper-button>
+                  </a>
+                </td>
+                <td class="colToggleStatus">
+                  <paper-button class="formBrn reserveTicket" onclick="TripsElement.toggleTripStatus(event);" raised>إلغاء</paper-button>
+                </td>
+                <td>
+                  <paper-button class="formBrn reserveTicket" style="background-color: red; color: white" on-click="deleteTrip" raised>حذف</paper-button>
+                </td>
+                <td class="changeFont">{{trip.price}}</td>
+                <td>
+                  <paper-checkbox on-tap="checkboxTabed"></paper-checkbox>
+                </td>
+              </tr>
+            </template>
+            </tbody>
+          </table>
+        </div>
+        <div style="text-align: left; padding: 15px;">
+          <paper-dropdown-menu id="selectAction" label="Select Action" vertical-align="bottom" horizontal-align="right">
+            <paper-listbox slot="dropdown-content">
+              <paper-item>أرشفة</paper-item>
+              <paper-item>إتاحة</paper-item>
+              <paper-item>إلغاء</paper-item>
+            </paper-listbox>
+          </paper-dropdown-menu>
+          <paper-button class="page-bottom-btns" raised on-click="makeAction">تم</paper-button>
+        </div>
+      </div>
+      <div id="createTripDiv" class="createTripDiv">
+        <form id="tripForm" method="post">
+          <div>
+            <label>اسم الرحلة</label><input type="text" id="tripName" value="{{tripName}}">
+          </div>
+          <div>
+            <label>التاريخ</label><input  type="date" id="date" value="{{date}}">
+          </div>
+          <div>
+            <label>الوقت</label>
+            <paper-button class="x-scope paper-button-0" style="color: #016064; margin: 0;" raised onclick="dialog.open()">اختيار الوقت</paper-button>
+            <paper-dialog id="dialog" modal class="paper-time-picker-dialog">
+              <paper-time-picker id="timePicker" time="{{time}}"></paper-time-picker>
+              <div class="buttons">
+                <!-- <paper-button dialog-dismiss>إلغاء</paper-button> -->
+                <paper-button dialog-confirm>تم</paper-button>
+              </div>
+            </paper-dialog>
+
+          </div>
+          <div>
+            <label>من</label><input type="text" id="from" value="{{from}}">
+          </div>
+          <div>
+            <label>إلى</label><input type="text" id="to" value="{{to}}">
+          </div>
+          <div>
+            <label style="display: inline-block">مدة الرحلة</label>
+            <div class="durationDiv">
+              <input type="text" id="duration">
+              <select id="seleceDuration">
+                <option value="ساعة">ساعة</option>
+                <option value="يوم">يوم</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label>عدد المقاعد</label>
+            <select id="selectTag">
+              <option value="14">14</option>
+              <option value="28">28</option>
+              <option value="29">29</option>
+              <option value="30">30</option>
+              <option value="31">31</option>
+              <option value="32">32</option>
+              <option value="52">52</option>
+            </select>
+          </div>
+          <div>
+            <label>سعر التذكرة</label><input type="text" id="price" value={{price}}>
+          </div>
+          <div>
+            <label>اسم السائق</label><input type="text" id="driverName" value={{driverName}}>
+          </div>
+          <div>
+            <label>رقم التليفون</label><input type="text" id="driverPhone" value={{driverPhone}}>
+          </div>
+          <div>
+            <label></label>
+            <paper-button id="createTripBtn" class="page-bottom-btns" onclick="TripsElement.doneAddTrip();">إنشاء</paper-button>
+            <paper-button id="cancelCreateTripBtn" class="page-bottom-btns" onclick="TripsElement.cancelAddTrip();">الغاء</paper-button>
+          </div>
+        </form>
+      </div>
+      <!-- </template> -->
+      <div id="ticketReserve" class="ticketReserve">
+        <div class="seats" id="seatsDiv">
+          <template id="seatsTemplate" is="dom-repeat" items="{{seats}}" as="seat">
+
+
+            <iron-icon style="color: rgb(132, 132, 132);" onclick="TripsElement.reserveSeat(this, event)" class="seatIcon " icon="event-seat">
+              {{seat.number}}
+            </iron-icon>
+          </template>
+        </div>
+        <form id="clientDetailsForm" method="post">
+          <div class="clientDetails">
+            <paper-input value="{{clientName}}" id="clientName" type="text" label="الاسم" required auto-validate error-message="مطلوب"></paper-input>
+            <paper-input value="{{clientPhone}}" id="clientPhone" type="text" label="التليفون" allowed-pattern="[0-9]" required auto-validate error-message="مطلوب"></paper-input>
+          </div>
+          <div class="reservBtns">
+            <paper-button class="page-bottom-btns" raised onclick="TripsElement.reserveNow();" _keyPressed>حجز</paper-button>
+            <paper-button class="page-bottom-btns" raised onclick="TripsElement.cancelReseve();">رجوع</paper-button>
+          </div>
+        </form>
+      </div>
+      <div id="printTicketsDiv" class="printTickets">
+        <template is="dom-repeat" items="{{tickets}}" as="ticket">
+          <div id="printedTicket" class="printedTicket">
+            <div class="row">
+              <div class="printedRightSide col-xs-6">
+                <div class="row printedLogoDiv">
+                  <div class="col-xs-6">
+                    <img class="ticketLogo" src="/images/png/logo%20pages-01.png">
+                  </div>
+                  <div class="printedSeatNum col-xs-6">
+                    <p>رقم المقعد<span>{{ticket.seatNo}}</span></p>
+                  </div>
+                </div>
+                <div class="printedTicketDetailsRight">
+                  <div class="allDetails allDetailsRight">
+                    <p>الإسم</p><p>{{ticket.ownerName}}</p>
+                  </div>
+                  <div class="allDetails allDetailsRight">
+                    <p>التاريخ</p><p>{{ticket.date}} <span class="printedTime"> {{ticket.time}}</span></p>
+                  </div>
+                  <div class="allDetails allDetailsRight">
+                    <p>من</p><p>{{ticket.from}}</p>
+                  </div>
+                  <div class="allDetails allDetailsRight">
+                    <p>إلى</p><p>{{ticket.to}}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="printedLeftSide removePadding col-xs-4">
+                <div class="printedTicketDetailsLeft removePadding">
+                  <div class="allDetails allDetailsCenter">
+                    <p>رقم المقعد</p><p>{{ticket.seatNo}}</p>
+                  </div>
+                  <div class="allDetails allDetailsCenter">
+                    <p>الإسم</p><p>{{ticket.ownerName}}</p>
+                  </div>
+                  <div class="allDetails allDetailsCenter">
+                    <p>التاريخ</p><p>{{ticket.date}} <span class="printedTime">{{ticket.time}}</span></p>
+                  </div>
+                  <div class="allDetails allDetailsCenter">
+                    <p>من</p><p>{{ticket.from}}</p>
+                  </div>
+                  <div class="allDetails allDetailsCenter">
+                    <p>إلى</p><p>{{ticket.to}}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="removePadding col-xs-2">
+                <img class="ticketLeftImg" src="/images/png/1-02.png">
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
+      <div id="printBtns" class="printBtns">
+        <paper-button class="page-bottom-btns" raised onclick="window.print();">طباعة</paper-button>
+        <paper-button class="page-bottom-btns" raised onclick="TripsElement.backToTrips()">رجوع</paper-button>
+      </div>
+    </div>
+
+    <!--dialoge for deleting-->
+    <paper-dialog id="confirmDialog" with-backdrop style="width: 300px; direction: rtl;" >
+      <h4 style="text-align: center; margin-top: 30px;" >هل تريد بالفعل حذف رحلة <span id="tripNameView" style="color: red"></span>؟</h4>
+      <h5 style="color: red;text-align: right;" >تأكد ان الرحلة بدون حسابات و تذاكر*</h5>
+      <!--<hr style="background-color: #21CE41; width: 90px; align-items: center">-->
+      <br>
+      <div class="buttons">
+        <paper-button style="background-color: red; color: white" on-click="deleteTripNow" dialog-confirm>نعم</paper-button>
+        <paper-button dialog-dismiss >لا</paper-button>
+
+
+      </div>
+    </paper-dialog>
+
+    <paper-toast id="toastSucc" text=""></paper-toast>
+    <paper-toast id="toastWarning" class="fit-bottom" duration="0" text="خطأ, يرجى التأكد من الاتصال بالانترنت "></paper-toast>
+  </template>
+
+    <script>
+
+      var toastWarning;
+      var secondCall = true;
+        var context;
+        var pageName, createTripText, archivedTripsBtn;
+        var selectTag = '';
+        var seatsNo = '';
+        var createTripDiv, tripsTableDiv, addTripBtn;
+        var tripForm, clientDetailsForm;
+        var dialog;
+        var tripName, date, timePicker, from, to, seleceDuration, duration, price, driverName, driverPhone;
+        var ticketReserve, clientName, clientPhone;
+        var repeatedT;
+        var seatsTemplate, ironIconSeat;
+        var tripId, tripSeats, seatsDiv;
+        var seatsNumArr = [];
+        var printTicketsDiv;
+        var printBtns;
+        var tripsTable;
+        var tripsMultiSelectArr = [];
+      var confirmDialog;
+      var idToDelete = '';
+      var toastSucc;
+      var tripNameView;
+
+        class TripsElement extends Polymer.Element {
+            static get is() { return 'trips-element'; }
+            static get properties() {
+                return {
+                  trips:{
+                    type: Array,
+                    notify: true
+                  },
+                  seats: {
+                    type: Array,
+                    notify: true,
+                  },
+                  tickets: {
+                    type: Array,
+                    notify: true,
+                      value:[]
+                  }
+                };
+            }
+            ready(){
+              super.ready();
+              context = this;
+              pageName = this.$.pageName;
+              tripsTable = this.$.table;
+              createTripText = this.$.createTripText;
+              archivedTripsBtn = this.$.archivedTripsBtn;
+              tripsTableDiv = this.$.tripsTableDiv;
+              createTripDiv = this.$.createTripDiv;
+              addTripBtn = this.$.addTripBtn;
+              tripForm = this.$.tripForm;
+              tripName = this.$.tripName;
+              date = this.$.date;
+              timePicker = this.$.timePicker;
+              from = this.$.from;
+              to = this.$.to;
+              duration = this.$.duration;
+              seleceDuration = this.$.seleceDuration;
+              selectTag = this.$.selectTag;
+              price = this.$.price;
+              driverName = this.$.driverName;
+              driverPhone = this.$.driverPhone;
+              dialog = this.$.dialog;
+              timePicker = this.$.timePicker;
+              repeatedT = this.$.repeatedT;
+              ticketReserve = this.$.ticketReserve;
+              clientName = this.$.clientName;
+              clientPhone = this.$.clientPhone;
+              seatsDiv = this.$.seatsDiv;
+              seatsTemplate = this.$.seatsTemplate;
+              ironIconSeat  = this.$.ironIconSeat;
+              clientDetailsForm = this.$.clientDetailsForm;
+              printTicketsDiv = this.$.printTicketsDiv;
+              printBtns = this.$.printBtns;
+              createTripDiv.style.display = "none";
+              ticketReserve.style.display = "none";
+              printTicketsDiv.style.display = 'none';
+              printBtns.style.display = 'none';
+                confirmDialog = this.$.confirmDialog;
+                toastSucc = this.$.toastSucc;
+                tripNameView = this.$.tripNameView;
+
+              // tripsTableDiv.style.display = 'none';
+              getTripsInArabic(function(tripData){
+                context.set('trips', tripData);
+
+                // get trip status and deal with it
+                var tr = tripsTable.getElementsByTagName("tbody")[0].rows;
+                // setTimeout to make sure getting data in trips property
+                setTimeout(() => {
+                  // i = 1 to pass the haed of the table
+                  for(let i = 1; i < tr.length; i++){
+                    var tripStatus = tr[i].__templatizeInstance.__data.trip.tripStatus;
+                    var td = tr[i].getElementsByTagName('td');
+                    for (let j = 0; j < td.length; j++){
+                      var btn = td[8].getElementsByTagName('paper-button');
+                      // check for trip status
+                      if(tripStatus == false){
+                        td[6].innerHTML = '';
+                        btn[0].textContent = 'إتاحة'
+                      }else{
+                        td[6].innerHTML = '<paper-button class="formBrn reserveTicket" onclick="TripsElement.reserveTkt(event);" raised>حجز</paper-button>';
+                        btn[0].textContent = 'إلغاء'
+                      }
+                    }
+                  }
+
+                  checkUserType(function (admin) {
+                      if (!admin) {
+                          tr[0].getElementsByTagName('th')[8].remove();
+                          for(let i = 1; i < tr.length; i++) {
+                              var td = tr[i].getElementsByTagName('td');
+                              for (let j = 0; j < td.length; j++) {
+                                  if (td[j].className == "colToggleStatus") {
+                                      td[8].remove();
+                                  }
+                              }
+                          }
+                      }
+                  });
+                }, 1000);
+              });
+              //disable scroll wehn timePicker open
+              dialog.addEventListener('opened-changed', function(){
+                if(dialog.opened) {
+                  Polymer.IronDropdownScrollManager.pushScrollLock(dialog);
+                } else {
+                  Polymer.IronDropdownScrollManager.removeScrollLock(dialog);
+                }
+              });
+
+              var ismobile = mobilecheck;
+              if (ismobile()){
+                seatsDiv.className = 'seatsMobile';
+                dialog.className += ' paperDialogMobile';
+                timePicker.className += 'timePickerMobile';
+              }else{
+                seatsDiv.className = 'seats';
+              }
+            }
+            //get Array of multiple selected trips to make an action
+            checkboxTabed(e){
+              var mainTr = e.model.children[1];
+              var checked = e.model.__templateInfo.nodeList[9].checked;
+              var tripId = e.model.__data.trip.idOfTrip;
+              if(checked === false){
+                tripsMultiSelectArr.push(tripId);
+                mainTr.style.backgroundColor = '#EABD00';
+              }else if(checked === true){
+                for (var i=tripsMultiSelectArr.length-1; i>=0; i--) {
+                  if (tripsMultiSelectArr[i] === tripId) {
+                      tripsMultiSelectArr.splice(i, 1);
+                      mainTr.style.backgroundColor = 'transparent';
+                  }
+                }
+              }
+            }
+            // Make An Action Trips Function
+            makeAction(){
+              var selected = this.shadowRoot.querySelector('#selectAction').querySelector('paper-listbox').selected;
+              var trArr = this.shadowRoot.querySelector('table').querySelector('tbody').children;
+
+              if(selected === 0){
+                archiveTrips(tripsMultiSelectArr);
+                clearChecked();
+              }else if(selected === 1){
+                openTrips(tripsMultiSelectArr);
+                clearChecked();
+              }else if(selected === 2){
+                closeTrips(tripsMultiSelectArr);
+                clearChecked();
+              }
+              function clearChecked(){
+                // i = 1 to escape th of the table
+                for(let i = 1; i < trArr.length; i++){
+                  if(trArr[i].tagName == 'TR'){
+                    trArr[i].style.backgroundColor = 'transparent';
+                    trArr[i].children[11].children[0].checked = false;
+                    tripsMultiSelectArr = [];
+                  }
+                }
+              }
+            }
+            deleteTrip(e){
+                idToDelete = e.model.trip.idOfTrip;
+                tripNameView.innerHTML = e.model.trip.name;
+                confirmDialog.open();
+            }
+
+            deleteTripNow(){
+
+                deleteTrip(idToDelete, function (assignLogMsg) {
+                    toastSucc.text = assignLogMsg;
+                    toastSucc.open();
+                    idToDelete = '';
+                });
+            }
+            _keyPressed(event) {
+              if (event.which == 13 || event.keyCode == 13) {
+                TripsElement.reserveNow();
+              }
+              return true;
+            }
+            static reserveTkt(e){
+              tripsTableDiv.style.display = "none";
+              addTripBtn.style.display = "none";
+              tripId = repeatedT.modelForElement(e.target).__data.trip.idOfTrip;
+              tripSeats = repeatedT.modelForElement(e.target).__data.trip.seatsNo;
+              TripsElement.displaySeats();
+            }
+//            static changeTickets(e){
+//                tripId = repeatedT.modelForElement(e.target).__data.trip.idOfTrip;
+//                var boundFunction = function (tickets) {
+//                    this.__classProperties.tickets.value = tickets;
+//                    console.log(this.__classProperties.tickets);
+//                }.bind(this);
+//                getTickets(boundFunction);
+//            }
+            static displaySeats(){
+              pageName.innerHTML = "حجز";
+              createTripText.style.display = 'none';
+              archivedTripsBtn.style.display = 'none';
+              var oneSeat = [];
+			  var numberNow = 0;
+              for (let i = 1; i <= tripSeats; i++){
+                oneSeat.push({number: i});
+              }
+              context.set('seats', oneSeat);
+              getSeats(tripId, function(assignDoneSeats){
+                console.log(assignDoneSeats);
+                setTimeout(() => {
+                  for (let i = 0; i < seatsDiv.children.length; i++){
+                    seatsDiv.children[i].style.color = 'rgb(132, 132, 132)';
+                    seatsDiv.children[i].setAttribute('onclick', 'TripsElement.reserveSeat(this, event)');
+                    if(assignDoneSeats.includes(i+1)){
+                      seatsDiv.children[i].style.color = 'rgb(207, 27, 28)';
+                      seatsDiv.children[i].removeAttribute('onclick');
+                    }
+                    if(i === seatsDiv.children.length - 2){
+                      seatsDiv.children[i].style.marginLeft = "0";
+                    }else if(i=== 30) {
+                        seatsDiv.children[i].style.marginRight = "45px";
+                    }else {
+                      if(i % 2 === 0 && i % 4 !== 0){
+                        seatsDiv.children[i].style.marginRight = "45px";
+                      }
+                    }
+                      numberNow++;
+                  }
+                  console.log(seatsDiv.children.length);
+                  if(seatsDiv.children.length === 32){
+                      seatsDiv.children[30].style.marginRight = "45px";
+                  }
+                  if(context.seats.length > 0){
+                    ticketReserve.style.display = "block";
+                  }
+                }, 500);
+              });
+            };
+            static reserveSeat(t, e){
+              var iconColor;
+              var seatNumber = seatsTemplate.modelForElement(e.target).__data.seat.number;
+              if(t.style.color == 'rgb(132, 132, 132)'){
+                iconColor = 'rgb(26, 198, 96)';
+                seatsNumArr.push(seatNumber);
+              }else{
+                iconColor = 'rgb(132, 132, 132)';
+                var seatIndex = seatsNumArr.indexOf(seatNumber);
+                if (seatIndex > -1) {
+                    seatsNumArr.splice(seatIndex, 1);
+                }
+              }
+              return t.style.color = iconColor;
+            }
+            static reserveNow(){
+              var ids = [];
+              var seatsNumArr2 = seatsNumArr;
+
+              if(clientName.value != undefined && clientPhone.value != undefined){
+                if(clientName.value.trim() != '' && clientPhone.value.trim() != ''){
+                  seatsNumArr.forEach((num) => {
+                    createTicket(tripId, num, clientName.value, clientPhone.value, function(idOfTicketNow, logMsg){
+                      ids.push(idOfTicketNow);
+                      if(ids.length == seatsNumArr2.length){
+                        var ticketsArr = [];
+                        ids.forEach((idT) => {
+                          getTicket(idT, function(assignTicketData){
+                            ticketsArr.push(assignTicketData);
+                            if(ticketsArr.length == ids.length){
+                              context.set('tickets', ticketsArr);
+                            }
+                          });
+                          context.seats = [];
+                          seatsNumArr = [];
+                          clientName.value = '';
+                          clientPhone.value = '';
+                          clientDetailsForm.reset();
+                          printTicketsDiv.style.display = 'block';
+                          printBtns.style.display = 'block';
+                          ticketReserve.style.display = 'none';
+                        })
+                      }
+                    });
+                  });
+                }else{
+                  clientName.validate();
+                  clientPhone.validate();
+                }
+              }else{
+                clientName.validate();
+                clientPhone.validate();
+              }
+            }
+            // cancel reserve ticket
+            static cancelReseve(){
+              context.seats = [];
+              seatsNumArr = [];
+
+              clientName.value = '';
+              clientPhone.value = '';
+              clientDetailsForm.reset();
+              pageName.innerHTML = "الرحلات";
+              createTripText.style.display = 'block';
+              archivedTripsBtn.style.display = 'var(--layout-inline_-_display)';
+              ticketReserve.style.display = "none";
+              tripsTableDiv.style.display = "block";
+              addTripBtn.style.display = "block";
+            }
+            static printTicket(){
+              window.print();
+            }
+            static backToTrips(){
+              context.seats = [];
+              seatsNumArr = [];
+
+              clientName.value = '';
+              clientPhone.value = '';
+              pageName.innerHTML = "الرحلات";
+              createTripText.style.display = 'block';
+              archivedTripsBtn.style.display = 'var(--layout-inline_-_display)';
+              printTicketsDiv.style.display = 'none';
+              printBtns.style.display = 'none';
+              tripsTableDiv.style.display = "block";
+              addTripBtn.style.display = "block";
+            }
+            static addTripDiv(){
+              archivedTripsBtn.style.display = 'none';
+              createTripDiv.style.display = "block";
+              tripsTableDiv.style.display = "none";
+              addTripBtn.style.display = "none";
+            }
+            // add new trip after filling all inputs
+            static doneAddTrip(){
+              seatsNo = selectTag.options[selectTag.selectedIndex].value;
+              var seatsNoN = parseInt(seatsNo);
+              var priceN = parseInt(price.value);
+              var driverPhoneN = parseInt(driverPhone.value);
+              var selectedDuration = seleceDuration.options[seleceDuration.selectedIndex].value;
+              var getDuration;
+
+              if(selectedDuration == "يوم"){
+                if(parseInt(duration.value) == 1){
+                  getDuration = "يوم واحد";
+                }else if(parseInt(duration.value) == 2){
+                  getDuration = "يومان";
+                }else if(parseInt(duration.value) > 2 && parseInt(duration.value) <= 10){
+                  getDuration = duration.value + " " + "ايام";
+                }else if(parseInt(duration.value) > 10){
+                  getDuration = duration.value + " " + "يوم";
+                }
+              }else{
+                if(parseInt(duration.value) == 1){
+                  getDuration = "ساعة واحدة";
+                }else if(parseInt(duration.value) == 2){
+                  getDuration = "ساعاتان";
+                }else if(parseInt(duration.value) > 2 && parseInt(duration.value) <= 10){
+                  getDuration = duration.value + " " + "ساعات";
+                }else if(parseInt(duration.value) > 10){
+                  getDuration = duration.value + " " + "ساعة";
+                }
+              }
+
+              addNewTrip(tripName.value, from.value, to.value, getDuration, date.value, timePicker.time, seatsNoN, priceN, driverName.value, driverPhone.value);
+              date.value = '';
+              tripForm.reset();
+              createTripDiv.style.display = "none";
+              tripsTableDiv.style.display = "block";
+              addTripBtn.style.display = "block";
+              archivedTripsBtn.style.display = 'var(--layout-inline_-_display)';
+
+            }
+            // cancel trip when add new one
+            static cancelAddTrip(){
+              tripForm.reset();
+              createTripDiv.style.display = "none";
+              tripsTableDiv.style.display = "block";
+              addTripBtn.style.display = "block";
+              archivedTripsBtn.style.display = 'var(--layout-inline_-_display)';
+            }
+            // toggle trip status available or not
+            static toggleTripStatus(e){
+              var idTrip = repeatedT.modelForElement(e.target).__data.trip.idOfTrip;
+              var tripStatus = repeatedT.modelForElement(e.target).__data.trip.tripStatus;
+              var status = '';
+              // change status according to the status in database
+              tripStatus == false ? status = true : status = false;
+              editTripStatus(idTrip, status);
+            }
+
+        }
+
+        window.customElements.define(TripsElement.is, TripsElement);
+    </script>
+</dom-module>

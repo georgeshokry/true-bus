@@ -1,0 +1,233 @@
+<!-- <link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+
+<dom-module id="user-acc">
+    <template>
+        <style include="granite-bootstrap">
+        #divUserAcc{
+          color: #016064;
+          font-size: 25px;
+        }
+        .userAccImg{
+          width: 120px;
+        }
+        .userAccNameDiv p{
+          display: inline-block;
+        }
+        .userAccNameDiv p:last-child{
+          color: #EABD00;
+          margin-right: 10px;
+        }
+        .changeFont{
+          font-family: sans-serif !important;
+        }
+        .userAccBox{
+          text-align: center;
+          margin-bottom: 20px;
+        }
+        .res{
+          font-size: 20px;
+          width: 100%;
+        }
+        .res p, .res paper-input{
+          display: inline-block;
+          margin-bottom: 10px;
+        }
+        .res p:first-child{
+          width: 125px;
+        }
+        .res p:last-child, .res paper-input{
+          margin-right: 10px;
+          width: 50%;
+        }
+        .doneAccBtn{
+           padding: 10px;
+           background-color: #016064;
+           color: #EABD00;
+           font-size: 18px;
+           margin-right: 40px;
+           margin-top: 25px;
+        }
+        .usersAccTable{
+          font-size: 14px;
+          font-weight: lighter;
+          width: 100%;
+          position: relative;
+        }
+        .tableScroller{
+          margin-right: 100px;
+          overflow-x: scroll;
+        }
+        table{
+          text-align: center !important;
+        }
+        th{
+          text-align: center !important;
+          color: #97BEC0;
+        }
+        .stickyCol{
+          position: absolute;
+          right: 0;
+          top: auto;
+          min-width: 100px;
+          min-height: 40px;
+          background-color: #F9F9F9;
+        }
+        .row{
+          display: -webkit-box;
+          display: -webkit-flex;
+          display: -ms-flexbox;
+          display: flex;
+          -webkit-flex-wrap: wrap;
+              -ms-flex-wrap: wrap;
+                  flex-wrap: wrap;
+        }
+        .correctDir{
+          float: right !important;
+          height: 100%;
+          align-self: flex-end !important;
+        }
+        th, td{
+          padding-bottom: 10px !important;
+          padding-top: 10px !important;
+          background-color: white;
+          white-space: nowrap;
+        }
+        </style>
+        <!-- app-location binds to the app's URL -->
+        <app-location route="{{route}}" use-hash-as-path="true"></app-location>
+        <!-- this app-route manages the top-level routes -->
+        <app-route
+                route="{{route}}"
+                pattern="/user-accounting/:user_id"
+                data="{{routeData}}"></app-route>
+
+        <div id="divUserAcc">
+          <div class="row" style="margin-bottom: 30px;">
+            <div class="correctDir col-lg-2 col-md-2 col-sm-3 col-xs-12">
+              <img class="userAccImg" src="../../../../images/png/3-01.png">
+            </div>
+            <div class="correctDir userAccNameDiv col-lg-7 col-md-6 col-sm-4">
+              <p id="pageName">اسم الموظف:</p><p id="userAccName"></p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-6">
+              <div class="userAccBox">
+                <div class="res">
+                  <p>الايرادات:</p><p id="userRevenues" class="changeFont">[[total]]</p>
+                </div>
+                <div class="res">
+                  <p>تم تحصيل:</p><paper-input id="userReceived" allowed-pattern="[0-9]" required value="[[paid]]" error-message ="يجب ادخال رقم هنا و اقل رقم هو 0"></paper-input>
+                </div>
+                <div class="res">
+                  <p>المتبقى:</p><p id="userRemainder" class="changeFont">[[remaining]]</p>
+                </div>
+                <div>
+                  <paper-button raised class="doneAccBtn" onclick="UserAcc.updatePaid()">حفظ</paper-button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="usersAccTableDiv" class="usersAccTable">
+            <div class="tableScroller">
+              <table class="table">
+                <tbody id="tbody">
+                  <tr>
+                    <th class="stickyCol">اسم الرحلة</th>
+                    <th>رقم الكرسى</th>
+                    <th>وقت الحجز</th>
+                    <th>سعر التذكرة</th>
+                  </tr>
+                  <template id="repeatedUsers" is="dom-repeat" items="[[usersAcc]]" as="userAcc">
+                    <tr>
+                      <td class="stickyCol">[[userAcc.name]]</td>
+                      <td class="changeFont">[[userAcc.seatNo]]</td>
+                      <td class="changeFont">[[userAcc.createdTimeStamp]]</td>
+                      <td class="changeFont">[[userAcc.price]]</td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+    </template>
+
+    <script>
+
+        var conetxtUser,paidInput;
+
+        class UserAcc extends Polymer.Element {
+            static get is() { return 'user-acc'; }
+            static get properties() {
+                return {
+                  usersAcc: {
+                    type: Array,
+                    value: [
+                      {
+                        tripName: "رحلة 3",
+                        seatNo: "16",
+                        time: "12:30",
+                        price: "100"
+                      }
+                    ]
+                  }
+                };
+            }
+            ready(){
+              super.ready();
+                conetxtUser = this;
+                paidInput = this.$.userReceived;
+                userId = this.routeData.user_id;
+            }
+            static updatePaid(){
+                if (paidInput.validate()){
+                    var paid = parseInt(paidInput.value);
+                    if (paid <= conetxtUser.total){
+                        var type = typeof paid;
+                        addPaid(userId,paid,function (msg) {
+
+                        });
+                    }else {
+                        paidInput.errorMessage = 'هذا الرقم اكبر من اجمالى الايرادات !';
+                        paidInput.invalid = true;
+                    }
+                }else {
+                }
+            }
+            static get observers() {
+                return [
+                    '_routeChanged(route.user.*)',
+                ]
+            }
+            _routeChanged(changeRecord) {
+                if (this.routeData.user_id){
+                    this.total = "جار التحميل...";
+                    this.paid = "جار التحميل...";
+                    this.remaining = "جار التحميل...";
+                    this.usersAcc = [];
+                    userId = this.routeData.user_id;
+                    paidInput = this.$.userReceived;
+                    paidInput.disabled =true;
+                    getRemainTrip(userId,function (data) {
+                       conetxtUser.total = data.total;
+                        conetxtUser.paid = data.paid;
+                        conetxtUser.remaining = data.remaining;
+                        paidInput.disabled = false;
+
+                    });
+                    getUserTickets(userId,function (ticketData) {
+                        conetxtUser.usersAcc = ticketData;
+                    });
+                    var boundFunction = function (user) {
+                        // conetxtTickets.set('tickets', tickets);
+                    };
+                    // getTickets(tripId,boundFunction);
+                }
+            }
+
+        }
+
+        window.customElements.define(UserAcc.is, UserAcc);
+    </script>
+</dom-module> -->

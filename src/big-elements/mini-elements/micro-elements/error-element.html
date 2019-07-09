@@ -1,0 +1,46 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../../../bower_components/iron-icons/iron-icons.html">
+
+<dom-module id="error-element">
+    <template>
+        <style include="granite-bootstrap">
+            #errorDiv{
+                color: #016064;
+                font-size: 25px;
+                text-align: center;
+                height: 100%;
+                width: 100%;
+            }
+            #errorDiv h1{
+                font-family: 'Roboto', sans-serif;
+            }
+            iron-icon{
+                height: 30%;
+                width: 30%;
+            }
+        </style>
+
+
+        <div id="errorDiv">
+            <iron-icon icon="icons:error"></iron-icon>
+            <h1>404</h1>
+            <h1>هذه الصفحة غير موجودة !</h1>
+            <a href="/#/">العودة الى الرئيسية</a>
+        </div>
+    </template>
+
+    <script>
+
+        class ErrorElement extends Polymer.Element {
+            static get is() { return 'error-element'; }
+            static get properties() {
+                return {};
+            }
+            ready(){
+                super.ready();
+            }
+        }
+
+        window.customElements.define(ErrorElement.is, ErrorElement);
+    </script>
+</dom-module>

@@ -1,0 +1,433 @@
+<!-- <link rel="import" href="../../../../bower_components/polymer/polymer-element.html"> -->
+<link rel="import" href="../../../../bower_components/polymer/lib/legacy/class.html">
+
+<link rel="import" href="../../../../bower_components/paper-toast/paper-toast.html">
+<script src="../../../../services/users-services.js"></script>
+
+<dom-module id="users-element">
+    <template>
+        <style include="granite-bootstrap">
+        #divMainUsers{
+          color: #016064;
+          font-size: 25px;
+        }
+        .userImg{
+          width: 120px;
+        }
+        .changeFont{
+          font-family: sans-serif !important;
+        }
+        .usersTable{
+          font-size: 14px;
+          font-weight: lighter;
+          width: 100%;
+          position: relative;
+        }
+        .tableScroller{
+          margin-right: 100px;
+          overflow-x: scroll;
+        }
+        table{
+          text-align: center !important;
+        }
+        th{
+          text-align: center !important;
+          color: #97BEC0;
+        }
+        .stickyCol{
+          position: absolute;
+          right: 0;
+          top: auto;
+          min-width: 120px;
+          height: 53px;
+          background-color: #F9F9F9;
+        }
+        .row{
+          display: -webkit-box;
+          display: -webkit-flex;
+          display: -ms-flexbox;
+          display: flex;
+          -webkit-flex-wrap: wrap;
+              -ms-flex-wrap: wrap;
+                  flex-wrap: wrap;
+        }
+        .correctDir{
+          float: right !important;
+          height: 100%;
+          align-self: flex-end !important;
+        }
+        .leftSide p{
+          margin-top: 5px;
+        }
+        .addUserBtn{
+          bottom: 5px;
+          width: 48px;
+          height: 48px;
+          color: #EABC00;
+        }
+        th, td{
+          padding-bottom: 10px !important;
+          padding-top: 10px !important;
+          background-color: white;
+          white-space: nowrap;
+        }
+        .removePadding{
+          padding: 0;
+        }
+        .formBtn{
+          color: #EABC00;
+          background-color: #016064;
+          padding: 5px 0 5px 0;
+          font-size: 16px;
+          font-weight: bold;
+        }
+        .formAddBtn{
+          margin-top: 10px;
+        }
+        .createUserDiv{
+          text-align: center;
+          font-size: 14px;
+        }
+        .createUserDiv div{
+          margin-bottom: 15px;
+        }
+        .createUserDiv label{
+          width: 10%;
+          min-width: 100px;
+          text-align: right;
+          margin-left: 20px;
+        }
+        .createUserDiv input, .createUserDiv select, vaadin-date-picker {
+          width: 25%;
+          min-width: 200px;
+        }
+        .createUserDiv input, .createUserDiv select, vaadin-date-picker {
+          box-shadow: 0 0 3px gray;
+          border: 0;
+          height: 25px;
+        }
+        .createUserDiv input{
+          padding-right: 5px;
+        }
+        .page-bottom-btns{
+          background-color: #EABC00;
+          color: #016064;
+          font-size: 18px;
+          font-weight: 400;
+        }
+        #toastWarning {
+          text-align: center;
+          --paper-toast-background-color: red;
+          --paper-toast-color: white;
+        }
+        </style>
+        <div id="divMainUsers">
+            <div class="row" style="margin-bottom: 30px;">
+              <div class="correctDir col-lg-2 col-md-2 col-sm-3 col-xs-7">
+                <img class="userImg" src="../../../../images/png/3-01.png">
+              </div>
+              <div class="correctDir col-lg-7 col-md-6 col-sm-4">
+                <p id="pageName">المستخدمون</p>
+              </div>
+              <div class="correctDir col-lg-3 col-md-4 col-sm-5">
+                <div class="leftSide">
+                  <div class="row">
+                    <div class="removePadding col-md-10 col-sm-10 col-xs-10">
+                      <p id="createUserText" style="float:left;">إضافة مستخدم</p>
+                    </div>
+                    <div class="removePadding col-md-2 col-sm-2 col-xs-2">
+                      <paper-icon-button id="addUserBtn" class="addUserBtn" icon="add-box" onclick="UsersElement.addNewUser()"></paper-icon-button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+              <div id="usersTableDiv" class="usersTable">
+                <div class="tableScroller">
+                  <table class="table">
+                    <tbody id="tbody">
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div id="createUserDiv" class="createUserDiv">
+                <form id="userForm" method="post">
+                  <div>
+                    <label>ايميل المدير</label><input id="adminEmailCreate">
+                  </div>
+                  <div>
+                    <label>كلمة سر المدير</label><input type="password" id="adminPasswordCreate">
+                  </div>
+                  <div>
+                    <label>اسم المستخدم</label><input type="text" id="userNameCreate">
+                  </div>
+                  <div>
+                    <label>الايميل</label><input id="emailCreate" type="text"></input>
+                  </div>
+                  <div>
+                    <label>كلمة السر</label><input type="text" id="passwordCreate">
+                  </div>
+                  <div>
+                    <label>مدير</label>
+                    <select id="selectTypeCreate">
+                      <option value="1">مدير</option>
+                      <option value="0">موظف</option>
+                    </select>
+                  </div>
+                  <paper-button id="createUserBtn" class="page-bottom-btns" onclick="UsersElement.addUser();">إضافة</paper-button>
+                  <paper-button id="cancelUserBtn" class="page-bottom-btns" onclick="UsersElement.cancelAddUser();">الغاء</paper-button>
+                  </form>
+                </div>
+                <div id="editUserDiv" class="createUserDiv">
+                  <form>
+                    <div>
+                      <label>اسم المستخدم</label><input id="userNameEdit">
+                    </div>
+                    <div>
+                      <label>الايميل</label><input id="userEmailEdit">
+                    </div>
+                    <div>
+                      <label>الحالة</label>
+                      <select id="selectStatus">
+                        <option value="hired">فعال</option>
+                        <option value="suspended">موقوف</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label>تاريخ التعيين</label>
+                      <input id="hireDate" type="date">
+                    </div>
+                    <div>
+                      <label>مدير</label>
+                      <select id="selectType">
+                        <option value="1">مدير</option>
+                        <option value="0">موظف</option>
+                      </select>
+                    </div>
+                    <div>
+                      <paper-button id="editUserNowBtn" class="page-bottom-btns" onclick="UsersElement.editUserNow();">تم</paper-button>
+                      <paper-button id="cancelEditUserBtn" class="page-bottom-btns" onclick="UsersElement.cancelEditUser();">الغاء</paper-button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+      <paper-toast id="toastWarning" text=" "></paper-toast>
+    </template>
+
+    <script>
+        var context;
+        var usersTableDiv, addUserBtn, createUserDiv, createUserText;
+        var tbody;
+        var adminEmailCreate, adminPasswordCreate, userNameCreate, emailCreate, passwordCreate, selectTypeCreate;
+        var userId, uname, uhiredDate, ustatus, uemail, uadmin;
+        var editUserDiv, userNameEdit, selectStatus, hireDate, userEmailEdit, selectType;
+        var toastWarning;
+        var secondCall = true;
+
+        class UsersElement extends Polymer.Element {
+            static get is() { return 'users-element'; }
+            static get properties() {
+                return {
+                  users: {
+                    type: Array,
+                    notify: true
+                  }
+                };
+            }
+            ready(){
+              super.ready();
+              context = this;
+              tbody = this.$.tbody;
+              usersTableDiv = this.$.usersTableDiv;
+              addUserBtn = this.$.addUserBtn;
+              createUserText = this.$.createUserText;
+              createUserDiv = this.$.createUserDiv;
+              editUserDiv = this.$.editUserDiv;
+              userNameEdit = this.$.userNameEdit;
+              selectStatus = this.$.selectStatus;
+              hireDate = this.$.hireDate;
+              userEmailEdit = this.$.userEmailEdit;
+              selectType = this.$.selectType;
+              adminEmailCreate = this.$.adminEmailCreate;
+              adminPasswordCreate = this.$.adminPasswordCreate;
+              userNameCreate = this.$.userNameCreate;
+              emailCreate = this.$.emailCreate;
+              passwordCreate = this.$.passwordCreate;
+              selectTypeCreate = this.$.selectTypeCreate;
+                toastWarning = this.$.toastWarning;
+
+              createUserDiv.style.display = 'none';
+              editUserDiv.style.display = 'none';
+
+              getUsers(function(userData){
+
+                tbody.innerHTML = '';
+                context.set("users", userData);
+
+                var thData = ['اسم المستخدم', 'الايميل', 'تاريخ التوظيف', 'الحالة', 'مدير', ''];
+
+                var tr = document.createElement('tr');
+                thData.forEach((elm) => {
+                  var trHead = document.createElement('th');
+                  if (elm == 'اسم المستخدم'){
+                    trHead.className = 'stickyCol';
+                  }
+                  trHead.appendChild(document.createTextNode(elm));
+                  tr.appendChild(trHead);
+
+                  tbody.appendChild(tr);
+                });
+                checkUserType(function(assignUserType){
+                  if(assignUserType){
+
+                    context.users.forEach((elm) => {
+                      var tr = document.createElement('tr');
+                      for (var i in elm){
+                        if(i != 'idOfUser'){
+                          var td = document.createElement('td');
+                          if(i == 'name'){
+                              td.className = 'stickyCol';
+                              td.appendChild(document.createTextNode(elm[i]));
+
+                          }else if (i == "hireDate"){
+                            td.className = 'changeFont';
+                            td.appendChild(document.createTextNode(elm[i]));
+                          }else if (i == "status"){
+                            if(elm[i] == "hired"){
+                              td.appendChild(document.createTextNode("فعال"));
+                            }else{
+                              td.appendChild(document.createTextNode("موقوف"));
+                            }
+                          }else if ( i == "email"){
+                            td.appendChild(document.createTextNode(elm[i]));
+                          }else if ( i == "admin"){
+                            if(elm[i] == true){
+                              td.appendChild(document.createTextNode("مدير"));
+                            }else{
+                              td.appendChild(document.createTextNode("موظف"));
+                            }
+                          }
+
+                          tr.appendChild(td);
+                        }
+                      }
+                      var td = document.createElement('td');
+                      var editBtn = document.createElement('paper-button');
+                      editBtn.setAttribute('onclick', 'UsersElement.editUser("'+ elm.name + "&,&" + elm.idOfUser + "&,&" + elm.hireDate + "&,&" + elm.status + "&,&" + elm.email + "&,&" + elm.admin + '")');
+                      editBtn.setAttribute('raised', '');
+                      editBtn.className = 'formBtn';
+                      editBtn.appendChild(document.createTextNode('تعديل'));
+                      td.appendChild(editBtn);
+
+                      //----ACCOUNTING FOR THE USER--//
+
+                      // var a = document.createElement('a');
+                      // a.setAttribute('href', '/#/user-accounting/' + elm.idOfUser);
+                      // var userAccBtn = document.createElement('paper-button');
+                      // userAccBtn.setAttribute('raised', '');
+                      // userAccBtn.className = 'formBtn';
+                      // userAccBtn.appendChild(document.createTextNode('حسابات'));
+                      // a.appendChild(userAccBtn);
+                      // td.appendChild(a);
+
+                      tr.appendChild(td);
+                      tbody.appendChild(tr);
+                    })
+                  }
+                })
+
+              });
+            }
+            static editUser(info){
+              createUserText.innerHTML = 'تعديل مستخدم';
+              selectStatus.options[0].removeAttribute('selected', 'selected');
+              selectStatus.options[1].removeAttribute('selected', 'selected');
+
+              selectType.options[0].removeAttribute('selected', 'selected');
+              selectType.options[1].removeAttribute('selected', 'selected');
+
+              var i = info.split('&,&');
+              uname = i[0];
+              userId = i[1];
+              uhiredDate = i[2];
+              ustatus = i[3];
+              uemail = i[4];
+              uadmin = i[5];
+
+              // make the date like the date picker
+              var now = new Date(uhiredDate);
+              var day = ("0" + now.getDate()).slice(-2);
+              var month = ("0" + (now.getMonth() + 1)).slice(-2);
+              var today = now.getFullYear()+"-"+(month)+"-"+(day) ;
+
+              userNameEdit.value = uname;
+              hireDate.value = today;
+              userEmailEdit.value = uemail;
+
+              if(ustatus == "hired"){
+                selectStatus.options[0].setAttribute('selected', 'selected');
+              }else{
+                selectStatus.options[1].setAttribute('selected', 'selected');
+              }
+              if(uadmin == "true"){
+                selectType.options[0].setAttribute('selected', 'selected');
+              }else{
+                selectType.options[1].setAttribute('selected', 'selected');
+              }
+
+              usersTableDiv.style.display = 'none';
+              addUserBtn.style.display = 'none';
+              editUserDiv.style.display = 'block';
+            }
+            static editUserNow(){
+              var selectedStatus = selectStatus.options[selectStatus.selectedIndex].value;
+              var selectedType = Boolean(parseInt(selectType.options[selectType.selectedIndex].value));
+
+              if(userId != '' && selectedStatus != '' && hireDate.value != '' && typeof selectedType == "boolean" && userEmailEdit.value != ''){
+
+                editUser(userId, selectedStatus, hireDate.value, userEmailEdit.value, userNameEdit.value, selectedType, function(assignLogMsg){
+                  UsersElement.cancelEditUser();
+                });
+              }
+            }
+            static cancelEditUser(){
+              createUserText.innerHTML = 'إضافة مستخدم';
+              userNameEdit.value = '';
+              userId = '';
+              hireDate.value = '';
+              context.selectedStatus = '';
+              editUserDiv.style.display = 'none';
+              usersTableDiv.style.display = 'block';
+              addUserBtn.style.display = 'block';
+            }
+            static addNewUser(){
+              usersTableDiv.style.display = 'none';
+              addUserBtn.style.display = 'none';
+              createUserDiv.style.display = 'block';
+            }
+            static addUser(){
+                showLoading();
+              var selectedTypeCreate = Boolean(parseInt(selectTypeCreate.options[selectTypeCreate.selectedIndex].value));
+              createUser(adminEmailCreate.value, adminPasswordCreate.value, emailCreate.value, passwordCreate.value, userNameCreate.value, selectedTypeCreate, function(assignLogMsg){
+                UsersElement.cancelAddUser();
+                  toastWarning.text = assignLogMsg;
+                  toastWarning.open();
+                hideLoading();
+              });
+            }
+            static cancelAddUser(){
+              adminEmailCreate.value = '';
+              adminPasswordCreate.value = '';
+              emailCreate.value = '';
+              passwordCreate.value = '';
+              userNameCreate.value = '';
+
+              usersTableDiv.style.display = 'block';
+              addUserBtn.style.display = 'block';
+              createUserDiv.style.display = 'none';
+            }
+        }
+
+        window.customElements.define(UsersElement.is, UsersElement);
+    </script>
+</dom-module>

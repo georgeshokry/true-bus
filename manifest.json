@@ -1,0 +1,7 @@
+{
+  "name": "Halogen",
+  "short_name": "Halogen",
+  "description": "halogen admin panel with polymer",
+  "start_url": "/",
+  "display": "standalone"
+}

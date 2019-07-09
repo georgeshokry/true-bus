@@ -1,0 +1,57 @@
+<!-- <link rel="import" href="../../bower_components/polymer/polymer-element.html"> -->
+<link rel="import" href="../../bower_components/polymer/lib/legacy/class.html">
+
+<link rel="import" href="signin-element.html">
+<link rel="import" href="halo-dashboard.html">
+
+<dom-module id="main-element">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      signin-element{
+        height: 100vh;
+      }
+    </style>
+    <div id="main">
+    </div>
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class MainElement extends Polymer.Element {
+      static get is() { return 'main-element'; }
+      static get properties() {
+        return {
+          prop1: {
+            type: String,
+            value: 'main-element'
+          }
+        };
+      }
+      ready(){
+        super.ready();
+        var main = this.$.main;
+        var signin = "";
+        var halo = "";
+        getSignedUser(function(user){
+          main.innerHTML = '';
+          if(user != null){
+            halo = document.createElement('halo-dashboard');
+            main.appendChild(halo);
+          }else{
+            signin = document.createElement('signin-element')
+            main.appendChild(signin);
+          }
+        })
+      }
+  }
+
+    window.customElements.define(MainElement.is, MainElement);
+
+  </script>
+</dom-module>

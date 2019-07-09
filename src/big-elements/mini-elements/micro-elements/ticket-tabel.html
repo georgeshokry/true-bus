@@ -1,0 +1,235 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+
+<dom-module id="ticket-tabel">
+    <template>
+        <style include="granite-bootstrap">
+        #divMainTicket{
+          color: #016064;
+          font-size: 25px;
+        }
+        .ticketImg{
+          width: 120px;
+        }
+        .changeFont{
+          font-family: sans-serif !important;
+        }
+        .ticketsTable{
+          font-size: 14px;
+          font-weight: lighter;
+          width: 100%;
+          position: relative;
+        }
+        .tableScroller{
+          margin-right: 100px;
+          overflow-x: scroll;
+        }
+        table{
+          text-align: center !important;
+        }
+        th{
+          text-align: center !important;
+          color: #97BEC0;
+        }
+        .stickyCol{
+          position: absolute;
+          right: 0;
+          top: auto;
+          min-width: 120px;
+          height: 53px;
+          background-color: #F9F9F9;
+        }
+        .row{
+          display: -webkit-box;
+          display: -webkit-flex;
+          display: -ms-flexbox;
+          display: flex;
+          -webkit-flex-wrap: wrap;
+              -ms-flex-wrap: wrap;
+                  flex-wrap: wrap;
+        }
+        .correctDir{
+          float: right !important;
+          height: 100%;
+          align-self: flex-end !important;
+        }
+        th, td{
+          padding-bottom: 10px !important;
+          padding-top: 10px !important;
+          background-color: white;
+          white-space: nowrap;
+        }
+        .ticketBtns{
+          width: 30px;
+          height: 30px;
+          padding: 0;
+          color: #016064;
+        }
+        .ticketBtns:hover{
+          color: #EABC00;
+        }
+        .ticketBtns:first-child{
+          margin-left: 20px;
+        }
+        .page-bottom-btns{
+          background-color: #EABC00;
+          color: #016064;
+          padding: 5px 0;
+          font-size: 18px;
+        }
+        @media print {
+          body{
+            margin: 0;
+          }
+          #divMainTicket *{
+            visibility: hidden;
+          }
+          #pageName{
+            visibility: visible;
+            min-width: 250px;
+            position: absolute;
+            left: 0;
+            top: -150px;
+          }
+          #ticketsTableDiv, #ticketsTableDiv * {
+            visibility: visible;
+          }
+          #ticketsTableDiv {
+            position: absolute;
+            left: 0;
+            top: 20px;
+          }
+          .tableScroller{
+            overflow: hidden;
+          }
+          #tdTicketBtns, #tdTicketBtns *{
+            visibility: hidden;
+          }
+          #tbody tr th:last-child{
+            visibility: hidden;
+          }
+        }
+        </style>
+        <!-- app-location binds to the app's URL -->
+        <app-location route="{{route}}" use-hash-as-path="true"></app-location>
+        <!-- this app-route manages the top-level routes -->
+        <app-route
+                route="{{route}}"
+                pattern="/ticket-tabel/:trip_id"
+                data="{{routeData}}"></app-route>
+
+        <div id="divMainTicket">
+          <div class="row" style="margin-bottom: 30px;">
+            <div class="correctDir col-lg-2 col-md-2 col-sm-3 col-xs-7">
+              <img class="ticketImg" src="../../../../images/png/4-01.png">
+            </div>
+            <div class="correctDir col-lg-7 col-md-6 col-sm-4">
+              <p id="pageName">[[tripName]]</p>
+            </div>
+          </div>
+          <div id="ticketsTableDiv" class="ticketsTable">
+            <div class="tableScroller">
+              <table class="table">
+                <tbody id="tbody">
+                  <tr>
+                    <th class="stickyCol">الاسم</th>
+                    <th>رقم التليفون</th>
+                    <th>رقم الكرسى</th>
+                    <th></th>
+                  </tr>
+                  <template id="repeatedTickets" is="dom-repeat" items="[[tickets]]" as="ticket">
+                    <tr>
+                      <td class="stickyCol">[[ticket.ownerName]]</td>
+                      <td>[[ticket.ownerPhone]]</td>
+                      <td>[[ticket.seatNo]]</td>
+                      <td id="tdTicketBtns">
+                        <a href="#/ticket/[[ticket.idOfTicket]]">
+                            <paper-icon-button class="ticketBtns" icon="print" alt="طباعة" title="طباعة"></paper-icon-button>
+                        </a>
+                        <paper-icon-button class="ticketBtns" icon="delete-forever" alt="حذف" title="حذف" onclick="TicketTabel.cancelTicket(event)"></paper-icon-button>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div style="text-align: left;">
+            <paper-button raised class="page-bottom-btns" onclick="window.print();">طباعة</paper-button>
+            <paper-button raised class="page-bottom-btns" on-click="back">رجوع</paper-button>
+          </div>
+        </div>
+    </template>
+
+    <script>
+
+        var conetxtTickets,repeatedTickets;
+
+        class TicketTabel extends Polymer.Element {
+            static get is() { return 'ticket-tabel'; }
+            static get properties() {
+                return {
+                  tickets: {
+                    type: Array,
+                    notify: true,
+                    value: []
+                  },
+                  tripId:{
+                    type:String,
+                    observer:"tripIdChanged"
+                  },
+                  tripName: String,
+                };
+            }
+            ready(){
+              super.ready();
+              conetxtTickets = this;
+              repeatedTickets = this.$.repeatedTickets;
+            }
+            static tripIdChanged(e){
+                tripId = repeatedT.modelForElement(e.target).__data.trip.idOfTrip;
+                console.log(this.tripName);
+                var boundFunction = function (tickets) {
+                  conetxtTickets.set('tickets', tickets);
+                  console.log(tickets[0].tripName);
+                  conetxtTickets.set('tripName', tickets[0].tripName);
+                };
+                getTickets(tripId,boundFunction);
+            }
+            static cancelTicket(e){
+                var ticketId = repeatedTickets.modelForElement(e.target).__data.ticket.idOfTicket;
+                delTicket(ticketId,function (msg) {
+                })
+            }
+
+            static get observers() {
+                return [
+                    '_routeChanged(route.ticket-tabel.*)',
+                    '_viewChanged(routeData.view)'
+                ]
+            }
+            _routeChanged(changeRecord) {
+              if (this.routeData.trip_id){
+                this.tripName = '';
+                this.tickets = [];
+                tripId = this.routeData.trip_id;
+                var boundFunction = function (tickets) {
+                  conetxtTickets.tickets = tickets;
+                  conetxtTickets.set('tripName', tickets[0].tripName);
+                };
+                getTickets(tripId,boundFunction);
+              }
+            }
+            _viewChanged(view) {
+                // console.log(view);
+
+                // load data for view
+            }
+            back(){
+              this.tripName = '';
+              window.history.back();
+            }
+        }
+
+        window.customElements.define(TicketTabel.is, TicketTabel);
+    </script>
+</dom-module>

@@ -1,0 +1,62 @@
+<!doctype html>
+<html dir="rtl" lang="ar">
+  <head>
+    <meta charset="utf-8" >
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>St-Mary</title>
+    <meta name="description" content="halogen admin panel with polymer">
+
+    <link rel="icon" sizes="192x192" href="favico.png">
+
+    <!-- See https://goo.gl/OOhYW5 -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="bootstrap-grid.css">
+
+    <script src="bower_components/webcomponentsjs/webcomponents-loader.js"></script>
+    <script src="services/auth.js"></script>
+
+    <link rel="import" href="src/big-elements/main-element.html">
+
+    <style>
+      #divLoading{
+        width: 100vw;
+        height: 100vh;
+        z-index: 4;
+        background-color: white;
+        text-align: center;
+        display: none;
+      }
+      #divLoading p {
+        vertical-align: middle;
+        font-family: GESS-Light;
+        font-size: 40px;
+        color: green;
+      }
+    </style>
+  </head>
+  <body>
+
+    <script src="https://www.gstatic.com/firebasejs/4.4.0/firebase.js"></script>
+    <script src="services/firebase-connection.js"></script>
+    <script src="services/auth.js"></script>
+
+    <div id="divLoading">
+      <p>جار التحميل ...</p>
+    </div>
+  <div id="main">
+    <main-element></main-element>
+  </div>
+  <script>
+  // var main = document.getElementById('main');
+  //
+  // if(location.pathname == '/panel'){
+  //   main.innerHTML = '';
+  //   document.write('<link rel="import" href="src/big-elements/main-element.html">');
+  //   var elm = document.createElement('main-element');
+  //   main.appendChild(elm);
+  // }
+  </script>
+  </body>
+</html>

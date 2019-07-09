@@ -1,0 +1,330 @@
+<link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="bower_components/polymer/lib/legacy/class.html">
+<link rel="import" href="bower_components/paper-toast/paper-toast.html">
+<script src="services/trips-screen-services.js"></script>
+
+<dom-module id="screen-element">
+    <template>
+        <style include="granite-bootstrap">
+            *{
+                font-family: GESS-Light;
+
+            }
+            #divMainTrips{
+                padding: 30px;
+                color: #016064;
+                font-size: 25px;
+                background: url("/images/png/back.jpg");
+                background-size: cover;
+                height: 100vh;
+            }
+            .tripImg{
+                width: 120px;
+            }
+            .tripsTable{
+                font-size: 16px;
+                font-weight: lighter;
+                width: 100%;
+                position: relative;
+                box-shadow: black;
+            }
+            .tableScroller{
+            //margin-right: 100px;
+                overflow-x: scroll;
+            }
+            table{
+                text-align: center !important;
+                min-width: 100%;
+            }
+            th{
+                text-align: center !important;
+                color: #97BEC0;
+            }
+            .stickyCol{
+            //position: absolute;
+                position: sticky;
+                right: 0;
+                top: auto;
+                max-width: 120px;
+            //height: 46px;
+                background-color: #016064;
+                color: white;
+
+            }
+            .row{
+                display: -webkit-box;
+                display: -webkit-flex;
+                display: -ms-flexbox;
+                display: flex;
+                -webkit-flex-wrap: wrap;
+                -ms-flex-wrap: wrap;
+                flex-wrap: wrap;
+            }
+            .correctDir{
+                float: right !important;
+                height: 100%;
+                align-self: flex-end !important;
+            }
+            .leftSide p{
+                margin-top: 5px;
+            }
+            th, td{
+                padding-bottom: 10px !important;
+                padding-top: 10px !important;
+                background-color: white;
+                word-wrap: break-word;
+                min-width: 110px;
+            }
+            .createTripDiv div{
+                margin-bottom: 15px;
+            }
+            .createTripDiv label{
+                width: 100%;
+                min-width: 75px;
+                text-align: right;
+                margin-left: 20px;
+            }
+            .createTripDiv input, .createTripDiv select, .createTripDiv paper-button, vaadin-date-picker {
+                width: 30%;
+                min-width: 200px;
+            }
+            .createTripDiv input, .createTripDiv select, vaadin-date-picker {
+                box-shadow: 0 0 3px gray;
+                border: 0;
+                height: 25px;
+            }
+            .createTripDiv input{
+                padding-right: 5px;
+            }
+            .createTripDiv paper-button{
+                color:  white;
+                font-size: 23px;
+                font-weight: 400;
+            }
+            @media (max-width: 711px) {
+                .w-100{
+                    width: 100% !important;
+                }
+                .leftSide{
+                    margin-right: 200px !important;
+                }
+            }
+            @media (min-width: 992px) {
+                .tripImg{
+                    float: left;
+                }
+            }
+            @media (max-width: 717px) {
+                .leftSide{
+                    margin-top: 30px;
+                }
+            }
+
+            paper-dialog{
+                direction: ltr;
+            }
+            .buttons paper-button {
+                color: #016064;
+                font-size: 18px;
+            }
+            @media (max-width: 450px) {
+                .clientDetails{
+                    width: 100%;
+                }
+            }
+            .printedSeatNum p{
+                display: table-cell;
+                width: 100%;
+            }
+            .printedSeatNum p:last-child{
+                color: #eabd00;
+            }
+
+            .allDetails p{
+                display: table-cell;
+                width: 320px;
+            }
+            .allDetails p:last-child{
+                color: #eabd00;
+            }
+            .allDetailsRight p{
+                border-bottom: 1px solid #358185;
+                padding: 15px;
+
+            }
+            .allDetailsRight p:first-child{
+                width: 80px;
+            }
+            .allDetailsLeft p{
+                padding: 5px;
+            }
+            .allDetailsLeft p:first-child{
+                width: 100px;
+            }
+
+            #toastNew{
+                text-align: center;
+                --paper-toast-background-color: blue;
+                --paper-toast-color: white;
+            }
+            #toastWarning {
+                text-align: center;
+                --paper-toast-background-color: red;
+                --paper-toast-color: white;
+            }
+            #pageName{
+                color: #016064;
+                text-shadow: 1px 1px 0 #ffffff;
+                margin-right: 10px;
+                margin-bottom: 0;
+
+            }
+            #backTable{
+                color: #016064;
+                border: 3px;
+                box-shadow: black;
+            }
+            tr:nth-child(odd) td{background-color: #ddd !important; color:#016064;}
+            .tableHead{
+                color: white;
+                background-color: #016064;
+            }
+            .firstCol{
+                min-width: 100px;
+                white-space: pre-wrap;
+            }
+        </style>
+        <div id="divMainTrips">
+            <div class="row" style="margin-bottom: 30px;">
+                <div class="correctDir col-lg-2 col-md-2 col-sm-3 col-xs-7">
+                    <img class="tripImg" src="/images/png/4-01.png">
+                </div>
+                <div class="correctDir col-lg-7 col-md-7 col-sm-4 col-xs-5">
+                    <p id="pageName">الرحلات الحالية</p>
+                </div>
+            </div>
+
+            <div id="tripsTableDiv" class="tripsTable">
+                <div class="tableScroller">
+                    <table class="table">
+                        <tbody>
+                        <tr>
+                            <th class="stickyCol">اسم الرحلة</th><th class="tableHead">التاريخ</th><th class="tableHead">الوقت</th><th class="tableHead">من</th>
+                            <th class="tableHead">إلى</th><th class="tableHead">مدة الرحلة</th><th class="tableHead">السعر</th><th class="tableHead">حالة الرحلة</th>
+                        </tr>
+                        <template id="repeatedT" is="dom-repeat" items="{{trips}}" as="trip">
+                            <tr>
+                                <td class="stickyCol firstCol">{{trip.name}}</td>
+                                <td class="changeFont">{{trip.date}}</td>
+                                <td class="changeFont">{{trip.time}}</td>
+                                <td>{{trip.from}}</td>
+                                <td>{{trip.to}}</td>
+                                <td>{{trip.duration}}</td>
+                                <td>{{trip.price}}</td>
+                                <td>{{trip.tripStatus}}</td>
+                                <!--<td><paper-button class="formBrn reserveTicket" onclick="TripsElement.reserveTkt(event);" raised>حجز</paper-button></td>-->
+                            </tr>
+                        </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="toastDiv">
+                <paper-toast id="toastNew" class="fit-bottom" text="تم تحديث الرحلات"></paper-toast>
+                <paper-toast id="toastWarning" class="fit-bottom" duration="0" text="خطأ, يرجى التأكد من الاتصال بالانترنت "></paper-toast>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        var toastNew;
+        var toastWarning;
+        var toastDiv;
+
+
+        var context;
+        var pageName, createTripText;
+        var selectTag = '';
+        var createTripDiv, tripsTableDiv, addTripBtn;
+        var tripForm,tripName,date,timePicker,from,to,duration,price;
+        var dialog;
+        var repeatedT;
+        var firstCall = true;
+        var secondCall = true;
+
+        class ScreenElement extends Polymer.Element {
+            static get is() { return 'screen-element'; }
+            static get properties() {
+                return {
+                    trips:{
+                        type: Array,
+                        notify: true
+                    }
+                };
+            }
+            ready(){
+                super.ready();
+                context = this;
+                pageName = this.$.pageName;
+                createTripText = this.$.createTripText;
+                tripsTableDiv = this.$.tripsTableDiv;
+                createTripDiv = this.$.createTripDiv;
+                addTripBtn = this.$.addTripBtn;
+                tripForm = this.$.tripForm;
+                tripName = this.$.tripName;
+                date = this.$.date;
+                timePicker = this.$.timePicker;
+                from = this.$.from;
+                to = this.$.to;
+                duration = this.$.duration;
+                selectTag = this.$.selectTag;
+                price = this.$.price;
+                dialog = this.$.dialog;
+                repeatedT = this.$.repeatedT;
+
+                toastWarning = this.$.toastWarning;
+                toastNew = this.$.toastNew;
+                toastDiv = this.$.toastDiv;
+
+
+                ////get all trips and listen for changes to view toast////
+                getTripsScreen(function(tripData){
+                    context.set('trips', tripData);
+                    if (!firstCall){
+                        toastNew.open();
+                    }else {
+                        firstCall = false;
+                    }
+                });
+//                ////for checking connection and view toast////
+//                checkConn(function (logMsg) {
+//                    if(!secondCall){
+//                        toastWarning.close();
+//                        if (logMsg === false) {
+//                            toastWarning.open();
+//                        } else if(logMsg === true){
+//                            toastWarning.close();
+//                        }
+//                    } else {
+//                        secondCall = false;
+//                    }
+//
+//                });
+// Add event listener offline to detect network loss.
+                window.addEventListener("offline", function(e) {
+                    HaloDashboard.checkConn(false);
+                });
+
+// Add event listener online to detect network recovery.
+                window.addEventListener("online", function(e) {
+                    HaloDashboard.checkConn(true);
+                });
+
+            }
+
+        }
+
+        window.customElements.define(ScreenElement.is, ScreenElement);
+    </script>
+</dom-module>

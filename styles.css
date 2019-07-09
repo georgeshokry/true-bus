@@ -1,0 +1,85 @@
+@font-face {
+    font-family: Ghla;
+    src: url("fonts/Ghla.ttf");
+}
+@font-face {
+    font-family: Ghla-Bold;
+    src: url("fonts/Ghla-2014-Bold.ttf");
+}
+
+@font-face {
+    font-family: GESS-Light;
+    src: url("fonts/GESS-Light.otf");
+}
+@page{
+    size:  auto;
+    margin: 0mm;
+}
+
+@media print{
+  body {margin-top:0 !important;}
+}
+
+body {
+  color: #333;
+  margin: 0;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  -webkit-touch-callout: none;
+  background-color: white;
+  padding-top: 0px;
+}
+
+section {
+  margin: 0px;
+}
+
+a, a:hover {
+  text-decoration: none;
+}
+
+
+paper-button {
+  margin: 0.5em 1em 0.5em 0;
+  width: 10em;
+}
+
+paper-button[right] {
+  position: fixed;
+  right: 0;
+}
+
+paper-checkbox {
+  margin-left: 1em;
+}
+
+paper-fab {
+  position: absolute !important;
+  top: 35px;
+  right: 1em;
+  z-index: 1;
+}
+
+paper-tabs {
+  background-color: #5677fc;
+  color: #fff;
+}
+
+paper-tabs paper-tab.iron-selected {
+  color: #ffff8d;
+}
+@font-face {
+  font-family: helveticaLight;
+  src: url('fonts/helvetica-light.ttf');
+}
+@font-face {
+  font-family: helveticaBold;
+  src: url('fonts/helvetica-bold.ttf');
+}
+@font-face {
+  font-family: helveticaWorldRegular;
+  src: url('fonts/HelveticaWorld-Regular.ttf');
+}

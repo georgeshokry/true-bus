@@ -1,0 +1,796 @@
+<!-- <link rel="import" href="../../../../bower_components/polymer/polymer-element.html"> -->
+<link rel="import" href="../../../../bower_components/polymer/lib/legacy/class.html">
+
+<link rel="import" href="../../../../bower_components/paper-toast/paper-toast.html">
+
+<script src="../../../../services/accounting-services.js"></script>
+<link rel="import" href="print-selected-acc.html">
+
+<dom-module id="accounting-element">
+    <template>
+        <style include="granite-bootstrap">
+          *{
+              font-family: GESS-Light;
+          }
+          a{
+            text-decoration: none !important;
+          }
+          #divMainAcc{
+            color: #016064;
+            font-size: 25px;
+          }
+          .changeFont{
+            font-family: sans-serif !important;
+          }
+          .accImg{
+            width: 120px;
+          }
+          #pageName{
+            margin: 0;
+          }
+          .row{
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-flex-wrap: wrap;
+                -ms-flex-wrap: wrap;
+                    flex-wrap: wrap;
+          }
+          .removePadding{
+            padding: 0;
+          }
+          .correctDir{
+            float: right !important;
+            height: 100%;
+            align-self: flex-end !important;
+          }
+          .leftSide{
+            width: 200px;
+          }
+          .leftSide p{
+            margin-top: 5px;
+          }
+          .addAccBtn{
+            bottom: 5px;
+            width: 48px;
+            height: 48px;
+            color: #EABC00;
+          }
+          @media (min-width: 992px) {
+            .accImg{
+              float: left;
+            }
+          }
+          @media (max-width: 711) {
+            .leftSide{
+              margin-right: 200px !important;
+            }
+          }
+          @media (max-width: 767px) {
+            .leftSide{
+              margin-top: 30px;
+            }
+          }
+          .whichTrips{
+            background-color: #f0f0f0;
+            color: #016064;
+            font-size: 13px;
+          }
+          paper-button.whichTrips:hover {
+            background-color: #62B7A7;
+          }
+          .activeBtn {
+            background-color: #016064;
+            color: white;
+          }
+          .tripsCard{
+            width: 350px;
+            --paper-card:{
+              margin: 10px 30px 10px 10px;
+              -webkit-transition: background-color 500ms ease;
+              -ms-transition: background-color 500ms ease;
+              transition: background-color 500ms ease;
+            }
+          }
+          .tripsCard:hover{
+            background-color: #62B7A7;
+            cursor: pointer;
+          }
+          .tripsCard p{
+            font-size: 18px;
+            padding: 10px;
+            margin: 0;
+          }
+          .tripsCard p:first-child{
+            float: right;
+          }
+          .tripsCard p:last-child{
+            float: left;
+          }
+          @media (max-width: 640px) {
+            .tripsCard{
+              width: 90%;
+            }
+            .trip-div{
+              width: 100% !important;
+            }
+          }
+          .results{
+            font-size: 18px;
+          }
+          .res{
+            width: 100%;
+          }
+          .res p{
+            display: inline-block;
+          }
+          .res p:first-child{
+            width: 150px;
+          }
+          .res p:last-child{
+            min-width: 100px;
+          }
+          .accBtns{
+            background-color: #016064;
+            color: #EABD00;
+            font-size: 18px;
+            margin: 10px;
+          }
+          .accNameDiv{
+            text-align: center;
+            width: 100%;
+          }
+          .accNameDiv p {
+            display: inline-block;
+          }
+          #accNowTName{
+            color: #EABD00;
+            margin-right: 10px;
+          }
+          #tst{
+            direction: ltr;
+            background-color: #B82C2C;
+          }
+        #toastWarning {
+          text-align: center;
+          --paper-toast-background-color: red;
+          --paper-toast-color: white;
+        }
+        .trip-div{
+          position: relative;
+          width: 390px;
+          display: inline-block;
+        }
+        .trips-checkbox{
+          position: absolute;
+          top: 35px;
+        }
+        .trip-checked{
+          background-color: #EABD00 !important;
+        }
+        .trip-checked:hover{
+          background-color: #F0D04C !important;
+        }
+        @media print {
+          body{
+            margin: 0;
+          }
+          #divMainAcc *{
+            visibility: hidden;
+          }
+          #accNow{
+            position: absolute;
+            top: 0;
+            right: 30px;
+          }
+          #accNow, #accNow * {
+            visibility: visible !important;
+          }
+          .accBtns{
+            display: none;
+          }
+          #addOthersBtn{
+            display: none;
+          }
+        }
+        .page-bottom-btns{
+          background-color: #EABC00;
+          color: #016064;
+          padding: 5px 0;
+          font-size: 18px;
+        }
+        .date-picker-div{
+          font-size: 14px;
+          padding: 10px;
+        }
+        .date-picker-div label{
+          width: 30px;
+          text-align: right;
+          margin-right: 10px;
+        }
+        input {
+          width: 25%;
+          min-width: 200px;
+          box-shadow: 0 0 3px gray;
+          border: 0;
+          margin: 5px;
+        }
+        </style>
+        <div id="divMainAcc">
+          <div class="row" style="margin-bottom: 30px;">
+            <div class="correctDir col-lg-2 col-md-2 col-sm-3 col-xs-7">
+              <img class="accImg" src="../../../../images/png/2-01.png">
+            </div>
+            <div class="correctDir col-lg-6 col-md-6 col-sm-4 col-xs-5">
+              <p id="pageName">الحسابات</p>
+            </div>
+          </div>
+          <div id="ifNotMainResutls">
+            <div class="row">
+              <paper-button id="prevTripsBtn" class="whichTrips" onclick="AccountingElement.prevTrips()">الرحلات السابقة</paper-button>
+              <paper-button id="presTripsBtn" class="whichTrips" onclick="AccountingElement.presTrips()">الرحلات الحالية</paper-button>
+              <a href="#/acc-archived-trips/">
+                <paper-button id="accArchivedTripsBtn" class="whichTrips">الرحلات المؤرشفة</paper-button>
+              </a>
+            </div>
+            <div id="tripsAcc" class="tripsAcc">
+              <div id="tripsAccPresDiv"></div>
+              <div id="tripsAccPrevDiv"></div>
+            </div>
+            <div id="accNow">
+              <div class="row">
+                <div class="col-lg-12 accNameDiv">
+                  <p>أسم الرحلة:</p><p id="accNowTName"></p>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-4" id="inputsDiv">
+                  <paper-input id="gas" allowed-pattern="[0-9]" label="البنزين"></paper-input>
+                  <paper-input id="driver" allowed-pattern="[0-9]" label="اجرة السائق"></paper-input>
+                  <paper-input id="bus" allowed-pattern="[0-9]" label="حجز الاتوبيس"></paper-input>
+                  <paper-input id="reservation" allowed-pattern="[0-9]" label="حجز الاماكن السياحية"></paper-input>
+                  <p style="font-size: 22px; display: inline-block; margin: 20px 0px;">اخرى</p>
+                  <paper-icon-button id="addOthersBtn" class="addOthersBtn" icon="add-box" onclick="AccountingElement.addOthers()"></paper-icon-button>
+                  <div id="others">
+                  </div>
+                </div>
+                <div class="col-md-8 results">
+                  <div class="res">
+                    <p>اجمالى المصروفات:</p><p id="result1" class="changeFont"></p>
+                  </div>
+                  <div class="res">
+                    <p>اجمالى الايرادات:</p><p id="result2" class="changeFont"></p>
+                  </div>
+                  <div class="res">
+                    <p>صافى الربح:</p><p id="result3" class="changeFont"></p>
+                  </div>
+                </div>
+              </div>
+
+              <paper-button class="accBtns" raised onclick="AccountingElement.calcData()">احسب</paper-button>
+              <paper-button class="accBtns" raised onclick="AccountingElement.addAccData()">اضافة الحسابات</paper-button>
+              <paper-button class="accBtns" raised onclick="AccountingElement.printAccData()">طباعة</paper-button>
+              <paper-button class="accBtns" raised onclick="AccountingElement.cancelCalcData()">رجوع</paper-button>
+            </div>
+          </div>
+          <!-- <div id="mainResultsDiv" class="col-md-8 results">
+            <div class="res">
+              <p>اجمالى المصروفات:</p><p id="finalResults1" class="changeFont"></p>
+            </div>
+            <div class="res">
+              <p>اجمالى الايرادات:</p><p id="finalResults2" class="changeFont"></p>
+            </div>
+            <div class="res">
+              <p>صافى الربح:</p><p id="finalResults3" class="changeFont"></p>
+            </div>
+            <div style="text-align: left;">
+              <paper-button raised class="page-bottom-btns" on-click="printAccSelected">كشف</paper-button>
+              <paper-button raised class="page-bottom-btns" on-click="back">رجوع</paper-button>
+            </div>
+          </div> -->
+          <print-selected-acc id="printSelectedAcc"></print-selected-acc>
+        </div>
+        <paper-toast id="tst" duration="0" text={{errorMsg}}>
+          <paper-button onclick="AccountingElement.toggleTst()">إغلاق</paper-button>
+        </paper-toast>
+      <paper-toast id="toastWarning" class="fit-bottom" duration="0" text="خطأ, يرجى التأكد من الاتصال بالانترنت "></paper-toast>
+
+    </template>
+
+    <script>
+        var context;
+        var prevTripsBtn, presTripsBtn, accArchivedTripsBtn;
+        var tripsAcc, tripsAccPrevDiv, tripsAccPresDiv, accNow, inputsDiv, others, ifNotMainResutls, mainResultsDiv, printSelectedAcc;
+        var gas, driver, bus, reservation;
+        var otherInputs = [];
+        var trIdNow;
+        var result1, result2, result3;
+        var finalResults1, finalResults2, finalResults3;
+        var tst;
+        var driverV, gasV, busV, reservationV;
+        var accNowTName;
+        var accTripsMultiSelectArr = {};
+        var dateNow;
+
+        class AccountingElement extends Polymer.Element {
+            static get is() { return 'accounting-element'; }
+            static get properties() {
+                return {
+                  tripsAccPrev: {
+                      type: Array
+                  },
+                  tripsAccPres: {
+                      type: Array
+                  },
+                  errorMsg: {
+                      type: String,
+                      notify: true,
+                      value: '',
+                      observer: 'msgChanged'
+                  },
+                };
+            }
+            ready(){
+                super.ready();
+
+                context = this;
+                prevTripsBtn = this.$.prevTripsBtn;
+                presTripsBtn = this.$.presTripsBtn;
+                accArchivedTripsBtn = this.$.accArchivedTripsBtn;
+                tripsAcc = this.$.tripsAcc;
+                tripsAccPrevDiv = this.$.tripsAccPrevDiv;
+                tripsAccPresDiv = this.$.tripsAccPresDiv;
+                accNow = this.$.accNow;
+                inputsDiv = this.$.inputsDiv;
+                others = this.$.others;
+                gas = this.$.gas;
+                driver = this.$.driver;
+                bus = this.$.bus;
+                reservation = this.$.reservation;
+                ifNotMainResutls = this.$.ifNotMainResutls;
+                // mainResultsDiv = this.$.mainResultsDiv;
+                printSelectedAcc = this.$.printSelectedAcc;
+
+                result1 = this.$.result1;
+                result2 = this.$.result2;
+                result3 = this.$.result3;
+                finalResults1 = this.$.finalResults1;
+                finalResults2 = this.$.finalResults2;
+                finalResults3 = this.$.finalResults3;
+                tst = this.$.tst;
+
+                accNowTName = this.$.accNowTName;
+
+                //hide accNow
+                accNow.style.display = 'none';
+                //display present trips when page loaded
+                tripsAccPresDiv.style.display = "block";
+                presTripsBtn.classList.add('activeBtn');
+
+                //hide prev. trips when page loaded
+                tripsAccPrevDiv.style.display = "none";
+                prevTripsBtn.classList.remove('activeBtn');
+
+                //hide Main Results
+                // mainResultsDiv.style.display = 'none';
+
+                //hide selected acc table
+                printSelectedAcc.style.display = 'none';
+
+                //get trips data
+                getTrips(function(tripData){
+                    console.log(tripData);
+                    //get Timezone offset
+                    var tzoffset = (new Date()).getTimezoneOffset() * 60000;
+
+                    //change date formate to database formate
+                    dateNow = new Date(Date.now() - tzoffset).toISOString().replace(/T.*/,'').split('-').join('-');
+
+                    //check user admin or not
+                    checkUserType(function(assignUserType){
+                      tripsAccPresDiv.innerHTML = '';
+                      tripsAccPrevDiv.innerHTML = '';
+
+                          var tripsAccPrevArr = [];
+                          var tripsAccPresArr = [];
+
+                          if(assignUserType){
+                            tripData.forEach((elm) => {
+                                var elmD = new Date(elm.date).getTime();
+                                if(new Date(dateNow).getTime() <= elmD){
+                                    tripsAccPresArr.push(elm)
+                                }else{
+                                    tripsAccPrevArr.push(elm)
+                                }
+                            });
+
+                            // set values of trips
+                            context.set('tripsAccPres', tripsAccPresArr);
+                            context.set('tripsAccPrev', tripsAccPrevArr);
+
+                            AccountingElement.whichTrips(context.tripsAccPres, tripsAccPresDiv);
+                            AccountingElement.whichTrips(context.tripsAccPrev, tripsAccPrevDiv);
+                        };
+                    });
+                });
+            };
+            //to know which trip to view
+            static whichTrips(whichTrip, whichDiv){
+              var id, tName;
+              var dropdownDiv = document.createElement('div');
+              var paperDropdownMenu = document.createElement('paper-dropdown-menu');
+              var paperListbox = document.createElement('paper-listbox');
+              var paperItem1 = document.createElement('paper-item');
+              var paperItem2 = document.createElement('paper-item');
+              var paperButton = document.createElement('paper-button');
+
+              if(whichTrip == context.tripsAccPrev){
+                var selectByDateDiv = document.createElement('div'),
+                    datePickerFrom = document.createElement('input'),
+                    datePickerTo = document.createElement('input'),
+                    fromLabel = document.createElement('label'),
+                    toLabel = document.createElement('label'),
+                    doneDateBtn = document.createElement('paper-button');
+
+                selectByDateDiv.className = 'date-picker-div';
+                doneDateBtn.appendChild(document.createTextNode('أحسب'));
+                doneDateBtn.className = 'page-bottom-btns';
+                doneDateBtn.addEventListener('click', function(){
+                  AccountingElement.accByDate(this);
+                });
+
+                fromLabel.appendChild(document.createTextNode('من:'));
+                toLabel.appendChild(document.createTextNode('إلى:'));
+
+                datePickerFrom.setAttribute('id', 'dateFrom');
+                datePickerFrom.setAttribute('type', 'date');
+                datePickerFrom.setAttribute('max', dateNow);
+
+                datePickerTo.setAttribute('id', 'dateTo');
+                datePickerTo.setAttribute('type', 'date');
+                datePickerTo.setAttribute('max', dateNow);
+
+                selectByDateDiv.appendChild(fromLabel);
+                selectByDateDiv.appendChild(datePickerFrom);
+                selectByDateDiv.appendChild(toLabel);
+                selectByDateDiv.appendChild(datePickerTo);
+                selectByDateDiv.appendChild(doneDateBtn);
+                whichDiv.appendChild(selectByDateDiv);
+              }
+
+              dropdownDiv.setAttribute('style', 'text-align: center; padding: 15px;');
+              paperDropdownMenu.setAttribute('vertical-align', 'bottom');
+              paperDropdownMenu.setAttribute('horizontal-align', 'right');
+              paperListbox.setAttribute('slot', 'dropdown-content');
+              paperButton.appendChild(document.createTextNode('تم'));
+              paperButton.className = 'page-bottom-btns';
+              // paperButton.setAttribute('onclick', 'AccountingElement.accMakeAction();');
+              paperButton.addEventListener('click', function(){
+                AccountingElement.accMakeAction(this);
+              });
+
+              whichTrip.forEach((elm) => {
+                  var div = document.createElement('div');
+                  var paperCard = document.createElement('paper-card');
+                  var checkbox = document.createElement('paper-checkbox');
+
+                  paperCard.className = 'tripsCard';
+                  checkbox.className = 'trips-checkbox';
+                  div.className = 'trip-div';
+
+                  for (var i in elm){
+                    if(i == 'name' || i == 'date'){
+                      if(i == "name"){
+                        tName = elm[i]
+                      }
+                      var p = document.createElement('p');
+                      if(i == 'date'){
+                          p.className = 'changeFont';
+                      }
+                      p.appendChild(document.createTextNode(elm[i]));
+                      paperCard.appendChild(p);
+                    }
+                    if(i == "idOfTrip"){
+                        id = elm[i];
+                    }
+                    paperCard.setAttribute('onclick', 'AccountingElement.accForOneTrip("'+ id + '","' + tName + '")');
+                    checkbox.value = id;
+                  }
+                  checkbox.addEventListener('change', function(){
+                    AccountingElement.checkboxTabed(this);
+                  });
+
+                  div.appendChild(checkbox);
+                  div.appendChild(paperCard);
+                  whichDiv.appendChild(div);
+              });
+              paperItem1.appendChild(document.createTextNode('أحسب'));
+              paperListbox.appendChild(paperItem1);
+              if(whichTrip == context.tripsAccPrev){
+                paperItem2.appendChild(document.createTextNode('ارشفة'));
+                paperListbox.appendChild(paperItem2);
+              }
+              paperDropdownMenu.appendChild(paperListbox);
+              dropdownDiv.appendChild(paperDropdownMenu);
+              dropdownDiv.appendChild(paperButton);
+              whichDiv.appendChild(dropdownDiv);
+            }
+            static accByDate(t){
+              var from = t.parentElement.querySelector('#dateFrom').value;
+              var to = t.parentElement.querySelector('#dateTo').value;
+
+              if(from != '' && to != ''){
+                getArchivedAccByDate(from, to, (assignTripsData) => {
+                  printSelectedAcc.printed_obj = assignTripsData;
+
+                  ifNotMainResutls.style.display = 'none';
+                  printSelectedAcc.style.display = 'block';
+                })
+              }
+            }
+            //get Array of multiple selected trips to make an action
+            static checkboxTabed(checkedElement){
+              var tripId = checkedElement.value;
+              var checked = checkedElement.checked;
+              var paperCard = checkedElement.nextSibling;
+
+              if(checked){
+                accTripsMultiSelectArr[tripId] = {};
+                paperCard.classList.add('trip-checked');
+              }else{
+                delete accTripsMultiSelectArr[tripId]
+                paperCard.classList.remove('trip-checked');
+              }
+            }
+
+            static accMakeAction(t){
+              var selected = t.parentElement.querySelector('paper-dropdown-menu').querySelector('paper-listbox').selected;
+
+              if(!isEmpty(accTripsMultiSelectArr)){
+                if(selected === 0){
+                  calArchivedAccData(accTripsMultiSelectArr, (assignOut) => {
+                    ifNotMainResutls.style.display = 'none';
+                    printSelectedAcc.style.display = 'block';
+                    // mainResultsDiv.style.display = 'block';
+
+                    printSelectedAcc.printed_obj = assignOut;
+                    this.clearChecked();
+                  });
+                  // getTotalForAll(context.printed_archived_acc_obj, (assignFinal) => {
+                  //   console.log(context.printed_archived_acc_obj);
+                  //
+                  //   finalResults1.innerHTML = assignFinal.finalTotalCosts;
+                  //   finalResults2.innerHTML = assignFinal.finalTotalRevenue;
+                  //   finalResults3.innerHTML = assignFinal.finalTotalInterest;
+                  //
+                  // });
+                }else if(selected === 1){
+                  archivingAccData(accTripsMultiSelectArr);
+                  this.clearChecked();
+                }
+              }
+
+              //check if object is empty
+              function isEmpty(obj) {
+                for(var prop in obj) {
+                  if(obj.hasOwnProperty(prop))
+                  return false;
+                }
+                return JSON.stringify(obj) === JSON.stringify({});
+              }
+
+            }
+            static clearChecked(){
+              var mainTripsAccDiv = tripsAcc.children;
+
+              for(let j = 0; j < mainTripsAccDiv.length; j++){
+                var divChildren = mainTripsAccDiv[j].children
+                if(divChildren.length > 1){
+                  // length-1 to ignore last div of dropdown
+                  for(let i = 0; i < divChildren.length-1; i++){
+                    divChildren[i].children[0].checked = false;
+                    divChildren[i].children[1].classList.remove('trip-checked');
+                  }
+                  accTripsMultiSelectArr = {};
+                }
+              }
+            }
+            printAccSelected(){
+              // mainResultsDiv.style.display = 'none';
+            }
+            back(){
+              mainResultsDiv.style.display = 'none';
+              ifNotMainResutls.style.display = 'block';
+            }
+            static openToast(){
+                this.$.tst.open();
+            }
+            static toggleTst(){
+                // context.tst.toggle();
+            }
+            msgChanged(){
+            }
+
+            //on click get trip accounting details and edit or add them
+            static accForOneTrip(trId, tName){
+                accNowTName.innerHTML = tName;
+                others.innerHTML = '';
+                bus.value = '';
+                driver.value = '';
+                gas.value = '';
+                reservation.value = '';
+                otherInputs = [];
+                trIdNow = trId;
+                getAccData(trId, function(assignData){
+                    tripsAcc.style.display = "none";
+                    accNow.style.display = 'block';
+                    prevTripsBtn.style.display = "none";
+                    presTripsBtn.style.display = "none";
+                    accArchivedTripsBtn.style.display = "none";
+                    if(assignData != null){
+                        assignData.forEach((elm) => {
+                            for (var i in elm){
+                                if(i == 'bus'){
+                                    bus.value = elm[i];
+                                }else if (i == 'gas'){
+                                    gas.value = elm[i];
+                                }else if(i == 'driver'){
+                                    driver.value = elm[i];
+                                }else if(i == 'reservation'){
+                                    reservation.value = elm[i];
+                                }else{
+                                    var div = '';
+                                    var paperInputLabel = '';
+                                    var paperInput = '';
+                                    div = document.createElement('div');
+                                    paperInputLabel = document.createElement('paper-input');
+                                    paperInputLabel.setAttribute('auto-validate', '');
+                                    paperInputLabel.setAttribute('required', '');
+                                    paperInputLabel.setAttribute('error-message', 'مطلوب');
+                                    paperInputLabel.value = i;
+                                    paperInputLabel.style.display = 'inline-block';
+                                    paperInputLabel.style.width = '50%';
+                                    paperInput = document.createElement('paper-input');
+                                    paperInput.setAttribute('allowed-pattern', '[0-9]');
+                                    paperInput.value = elm[i];
+                                    paperInput.style.display = 'inline-block';
+                                    paperInput.style.width = '50%';
+                                    div.style.display = 'block'
+                                    others.appendChild(div);
+                                    div.appendChild(paperInputLabel);
+                                    div.appendChild(paperInput);
+
+                                    otherInputs.push([paperInputLabel, paperInput]);
+                                }
+                            }
+                        })
+                    }
+                });
+            }
+            // add others to calc or add them to db
+            static addOthers(){
+                var div = document.createElement('div');
+                var paperInputLabel = document.createElement('paper-input');
+                paperInputLabel.style.display = 'inline-block';
+                paperInputLabel.setAttribute('auto-validate', '');
+                paperInputLabel.setAttribute('required', '');
+                paperInputLabel.setAttribute('error-message', 'مطلوب');
+                paperInputLabel.style.width = '50%';
+                var paperInput = document.createElement('paper-input');
+                paperInput.setAttribute('allowed-pattern', '[0-9]');
+                paperInput.style.display = 'inline-block';
+                paperInput.style.width = '50%';
+                div.style.display = 'block';
+
+                others.appendChild(div);
+                div.appendChild(paperInputLabel);
+                div.appendChild(paperInput);
+
+                otherInputs.push([paperInputLabel, paperInput]);
+            }
+            //calc data
+            static calcData(){
+                result1.innerHTML = '';
+                result2.innerHTML = '';
+                result3.innerHTML = '';
+
+                var objOfOthers = {};
+                AccountingElement.calcAndAdd(objOfOthers);
+
+                calAccData(trIdNow, driverV, reservationV, gasV, busV, objOfOthers, function(assignCalData){
+                  console.log(assignCalData);
+                  result1.innerHTML = assignCalData[0].totalCosts;
+                  result2.innerHTML = assignCalData[0].totalRevenue;
+                  result3.innerHTML = assignCalData[0].totalInterest;
+                })
+            }
+            static addAccData(){
+                var obj = {};
+                AccountingElement.calcAndAdd(obj);
+                obj['gas'] = gasV;
+                obj['driver'] = driverV;
+                obj['reservation'] = reservationV;
+                obj['bus'] = busV;
+
+                addAccData(trIdNow, obj, function(assignLogMsg){
+                    context.set('errorMsg', assignLogMsg);
+                });
+            }
+            // function for both calc and add data
+            static calcAndAdd(obj){
+                otherInputs.forEach((elm) => {
+                    for (var i in elm){
+                        if(isNaN(parseInt(elm[1].value)) == false) {
+                            if(elm[0].value == undefined || elm[0].value.trim() == ""){
+                                elm[0].validate();
+                                elm[0].value = '';
+                            }else{
+                                obj[elm[0].value] = parseInt(elm[1].value);
+                            }
+                        }
+                    }
+                });
+
+                driverV = parseInt(driver.value);
+                reservationV = parseInt(reservation.value);
+                gasV = parseInt(gas.value);
+                busV = parseInt(bus.value);
+
+                if(isNaN(driverV)){
+                    driverV = 0;
+                }
+                if(isNaN(reservationV)){
+                    reservationV = 0;
+                }
+                if (isNaN(gasV)){
+                    gasV = 0;
+                }
+                if(isNaN(busV)){
+                    busV = 0;
+                }
+            }
+            static cancelCalcData(){
+                result1.innerHTML = '';
+                result2.innerHTML = '';
+                result3.innerHTML = '';
+
+                tripsAcc.style.display = "block";
+                accNow.style.display = 'none';
+                prevTripsBtn.style.display = "block";
+                presTripsBtn.style.display = "block";
+                accArchivedTripsBtn.style.display = "block";
+                if(prevTripsBtn.classList.contains('activeBtn')){
+                    tripsAccPrevDiv.style.display = "block";
+                    tripsAccPresDiv.style.display = "none";
+                }else{
+                    tripsAccPresDiv.style.display = "block";
+                    tripsAccPrevDiv.style.display = "none";
+                }
+            }
+            static prevTrips(){
+              this.clearChecked();
+              prevTripsBtn.classList.add('activeBtn');
+              presTripsBtn.classList.remove('activeBtn');
+
+              tripsAccPrevDiv.style.display = "block";
+              tripsAccPresDiv.style.display = "none";
+            }
+            static presTrips(){
+              this.clearChecked();
+              tripsAccPresDiv.style.display = "block";
+              tripsAccPrevDiv.style.display = "none";
+
+              presTripsBtn.classList.add('activeBtn');
+              prevTripsBtn.classList.remove('activeBtn');
+            }
+            static printAccData(){
+              window.print();
+            }
+
+        }
+
+        window.customElements.define(AccountingElement.is, AccountingElement);
+
+    </script>
+</dom-module>

@@ -1,0 +1,193 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+
+<dom-module id="print-selected-acc">
+    <template>
+        <style include="granite-bootstrap">
+          *{
+              font-family: GESS-Light;
+          }
+
+          .changeFont{
+            font-family: sans-serif !important;
+          }
+          .tripImg{
+            width: 120px;
+          }
+          .tripsTable{
+            font-size: 14px;
+            font-weight: lighter;
+            width: 100%;
+            position: relative;
+          }
+          .tableScroller{
+            margin-right: 100px;
+            overflow-x: scroll;
+          }
+          table{
+            text-align: center !important;
+          }
+          th{
+            text-align: center !important;
+            color: #97BEC0;
+          }
+          .stickyCol{
+            position: absolute;
+            right: 0;
+            top: auto;
+            min-width: 100px;
+            height: 46px;
+            background-color: #F9F9F9;
+          }
+          .row{
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-flex-wrap: wrap;
+                -ms-flex-wrap: wrap;
+                    flex-wrap: wrap;
+          }
+          .correctDir{
+            float: right !important;
+            height: 100%;
+            align-self: flex-end !important;
+          }
+          th, td{
+            padding-bottom: 10px !important;
+            padding-top: 10px !important;
+            white-space: nowrap;
+          }
+          tr{
+            -webkit-transition: background-color 500ms ease;
+            -ms-transition: background-color 500ms ease;
+            transition: background-color 500ms ease;
+          }
+          .removePadding{
+            padding: 0;
+          }
+          .formBtn{
+            color: #EABC00;
+            background-color: #016064;
+            padding: 5px 0 5px 0;
+            font-size: 16px;
+            font-weight: bold;
+          }
+          .archived-trips{
+            background-color: #016064;
+            color: white;
+            font-size: 13px;
+          }
+          a {
+            text-decoration: none !important;
+          }
+          paper-button.archived-trips:hover {
+            color: black;
+            background-color: #62B7A7;
+          }
+
+          .reserveTicket{
+            background-color: #016064;
+            color: #EABC00;
+            padding: 0;
+            font-size: 18px;
+          }
+          .page-bottom-btns{
+            background-color: #EABC00;
+            color: #016064;
+            padding: 5px 0;
+            font-size: 18px;
+          }
+          #table tbody tr:nth-last-child(3){
+            display: none;
+          }
+          #table tbody tr:nth-last-child(1){
+            background-color: #BFBFBF;
+          }
+          @media print {
+            #tripsTableDiv, #tripsTableDiv *{
+              visibility: visible;
+            }
+            #tripsTableDiv{
+              top: -200px;
+              right: 0;
+            }
+            .page-bottom-btns{
+              display: none;
+            }
+            .tableScroller{
+              overflow-x: hidden;
+            }
+            #table tbody tr:nth-last-child(1) td:not(:first-child){
+              background-color: #BFBFBF !important;
+            }
+          }
+
+        </style>
+          <div id="tripsTableDiv" class="tripsTable">
+            <div class="tableScroller">
+              <table class="table" id="table">
+                <tbody>
+                  <tr>
+                    <th class="stickyCol">اسم الرحلة</th><th>التاريخ</th><th>المصروفات</th><th>الايرادات</th><th>صافى الربح</th>
+                  </tr>
+                  <template id="repeatedT" is="dom-repeat" items="{{_toArray(printed_obj)}}" as="trip">
+                    <tr>
+                      <td class="stickyCol">{{trip.name}}</td>
+                      <td class="changeFont">{{trip.date}}</td>
+                      <td class="changeFont">{{trip.totalCosts}}</td>
+                      <td class="changeFont">{{trip.totalRevenue}}</td>
+                      <td class="changeFont">{{trip.totalInterest}}</td>
+                    </tr>
+                  </template>
+                  <tr>
+                    <td class="stickyCol">الإجمالى</td>
+                    <td></td>
+                    <td class="changeFont">[[printed_obj.final.finalTotalCosts]]</td>
+                    <td class="changeFont">[[printed_obj.final.finalTotalRevenue]]</td>
+                    <td class="changeFont">[[printed_obj.final.finalTotalInterest]]</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div style="text-align: left; padding: 15px;">
+              <paper-button class="page-bottom-btns" raised onclick="window.print();">طباعة</paper-button>
+              <paper-button class="page-bottom-btns" raised on-click="back">رجوع</paper-button>
+            </div>
+          </div>
+    </template>
+
+    <script>
+
+        class PrintSelectedAcc extends Polymer.Element {
+            static get is() { return 'print-selected-acc'; }
+            static get properties() {
+                return {
+                  printed_obj: {
+                    type: Object,
+                    observer: '_dataChanged'
+                  },
+                };
+            }
+            ready(){
+                super.ready();
+            }
+            _dataChanged(OldValue, newValue){
+              console.log(OldValue);
+              console.log(newValue);
+            }
+            _toArray(obj) {
+              return Object.keys(obj).map(function(key) {
+                return  obj[key];
+              });
+              console.log(obj);
+            }
+            back(){
+              this.printed_obj = {};
+              this.style.display = 'none';
+              this.previousElementSibling.style.display = 'block';
+            }
+        }
+
+        window.customElements.define(PrintSelectedAcc.is, PrintSelectedAcc);
+    </script>
+</dom-module>

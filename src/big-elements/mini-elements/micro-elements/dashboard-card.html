@@ -1,0 +1,71 @@
+<!-- <link rel="import" href="../../../../bower_components/polymer/polymer-element.html"> -->
+<link rel="import" href="../../../../bower_components/polymer/lib/legacy/class.html">
+
+
+<dom-module id="dashboard-card">
+    <template>
+        <style>
+            paper-card{
+              --paper-card-background-color: none;
+              width: 100%;
+
+            }
+            img{
+                max-width: 100%;
+            }
+            *{
+                font-family: GESS-Light;
+                color: #016064;
+            }
+            .cardContent{
+                padding: 5px;
+                text-align: center;
+                width: 100%;
+            }
+            p{
+              font-size: 100%;
+              font-weight: bold;
+            }
+            a{
+                color: black;
+            }
+        </style>
+        <a href="{{link}}">
+            <paper-card elevation=0>
+              <div class="cardContent">
+                <img src="[[image_url]]">
+                    <p>[[title]]</p>
+
+                </div>
+            </paper-card>
+        </a>
+    </template>
+
+    <script>
+        /**
+         * @customElement
+         * @polymer
+         */
+        class DashboardCard extends Polymer.Element {
+            static get is() { return 'dashboard-card'; }
+            static get properties() {
+                return {
+                    image_url:{
+                    type:String
+                },
+                    text:{
+                        type:String
+                    },
+                    title:{
+                        type:String
+                    },
+                    link:{
+                        type:String
+                    }
+                };
+            }
+        }
+
+        window.customElements.define(DashboardCard.is, DashboardCard);
+    </script>
+</dom-module>

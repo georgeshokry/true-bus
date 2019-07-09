@@ -1,0 +1,271 @@
+<link rel="import" href="../../../../bower_components/polymer/polymer-element.html">
+
+<dom-module id="ticket-element">
+    <template>
+        <style include="granite-bootstrap">
+          #errorDiv{
+            color: #016064;
+            font-size: 25px;
+          }
+          .row{
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-flex-wrap: wrap;
+                -ms-flex-wrap: wrap;
+                    flex-wrap: wrap;
+          }
+          .changeFont{
+            font-family: sans-serif !important;
+          }
+          .removePadding{
+            padding: 0;
+          }
+          .printTickets{
+            width: 100%;
+            overflow-x: scroll;
+            overflow-y: hidden;
+          }
+          .correctDir{
+            float: right !important;
+            height: 100%;
+            align-self: flex-end !important;
+          }
+          .printedTicket{
+            margin: 10px auto;
+            background-color: #016064;
+            width: 610px;
+            height: 300px;
+            color: white;
+            overflow: hidden;
+          }
+          .printedRightSide{
+            font-size: 13px;
+            padding-right: 30px;
+            padding-top: 20px;
+          }
+          .printedLogoDiv{
+            margin-bottom: 20px;
+          }
+          .printedSeatNum{
+            position: relative;
+          }
+          .printedSeatNum p{
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 100%;
+            margin: 0;
+            color: white !important;
+          }
+          .printedSeatNum p span{
+            margin-right: 10px;
+            color: #eabd00 !important;
+          }
+          .allDetails{
+            display: table-row;
+            width: 100%;
+          }
+          .allDetails p{
+            display: table-cell;
+            width: 320px;
+          }
+          .allDetails p:last-child, .allDetails p span{
+            color: #eabd00 !important;
+          }
+          .printedTicketDetailsRight{
+            border: 1px solid #358185;
+            height: 190px;
+            width: 270px;
+            overflow-y: hidden;
+          }
+          .printedRightSide, .printedLeftSide{
+            display: table;
+          }
+          .printedRightSide{
+            height: 300px;
+            border-left: 2px dashed white !important;
+          }
+          .allDetailsRight p{
+            border-bottom: 1px solid #358185;
+            padding: 15px;
+          }
+          .allDetailsRight p:first-child{
+            width: 80px;
+          }
+          .printedLeftSide{
+            font-size: 10px;
+            margin-top: 50px;
+          }
+          .allDetailsCenter p{
+            padding: 5px;
+          }
+          .allDetailsCenter p:first-child{
+            width: 120px;
+          }
+          .printedTime{
+            margin-right: 40px;
+          }
+          .ticketLogo{
+            width: 100%;
+          }
+          .ticketLeftImg{
+            width: 100%;
+          }
+          .printBtns{
+            margin: 10px auto;
+            text-align: left;
+          }
+
+          @media print {
+            body{
+              margin: 0;
+            }
+            #errorDiv *, app-header, app-drawer-layout{
+              visibility: hidden;
+            }
+            #printTicketsDiv, #printTicketsDiv * {
+              visibility: visible;
+            }
+            #printTicketsDiv {
+              right: 0;
+              top: 0;
+            }
+            .printTickets{
+              overflow-x: hidden !important;
+            }
+            .printedTicket{
+              position: absolute;
+              top: -120px;
+                width: 610px;
+              margin: 0;
+              background-color: #016064 !important;
+            }
+            .allDetails p:first-child{
+              color: white !important
+            }
+
+            #divMainTrips{
+              padding: 0;
+            }
+          }
+          .page-bottom-btns{
+            background-color: #EABC00;
+            color: #016064;
+            padding: 5px 0;
+            font-size: 18px;
+          }
+        </style>
+
+        <!-- app-location binds to the app's URL -->
+        <app-location route="{{route}}" use-hash-as-path="true"></app-location>
+        <!-- this app-route manages the top-level routes -->
+        <app-route
+                route="{{route}}"
+                pattern="/ticket/:ticket_id"
+                data="{{routeData}}"></app-route>
+        <div id="errorDiv">
+          <div id="printTicketsDiv" class="printTickets">
+                <div class="pagebreak"> </div>
+              <div id="printedTicket" class="printedTicket">
+                <div class="row">
+                  <div class="printedRightSide col-xs-6">
+                    <div class="row printedLogoDiv">
+                      <div class="col-xs-6">
+                        <img class="ticketLogo" src="/images/png/logo pages-01.png">
+                      </div>
+                      <div class="printedSeatNum col-xs-6">
+                        <p>رقم المقعد<span>{{ticket.seatNo}}</span></p>
+                      </div>
+                    </div>
+                    <div class="printedTicketDetailsRight">
+                      <div class="allDetails allDetailsRight">
+                        <p>الإسم</p><p>{{ticket.ownerName}}</p>
+                      </div>
+                      <div class="allDetails allDetailsRight">
+                        <p>التاريخ</p><p>{{ticket.date}} <span class="printedTime"> {{ticket.time}}</span></p>
+                      </div>
+                      <div class="allDetails allDetailsRight">
+                        <p>من</p><p>{{ticket.from}}</p>
+                      </div>
+                      <div class="allDetails allDetailsRight">
+                        <p>إلى</p><p>{{ticket.to}}</p>
+                      </div>
+                    </div>
+                  </div>
+                    <div class="printedLeftSide removePadding col-xs-4">
+                      <div class="printedTicketDetailsLeft removePadding">
+                        <div class="allDetails allDetailsCenter">
+                          <p>رقم المقعد</p><p>{{ticket.seatNo}}</p>
+                        </div>
+                        <div class="allDetails allDetailsCenter">
+                          <p>الإسم</p><p>{{ticket.ownerName}}</p>
+                        </div>
+                        <div class="allDetails allDetailsCenter">
+                          <p>التاريخ</p><p>{{ticket.date}} <span class="printedTime">{{ticket.time}}</span></p>
+                        </div>
+                        <div class="allDetails allDetailsCenter">
+                          <p>من</p><p>{{ticket.from}}</p>
+                        </div>
+                        <div class="allDetails allDetailsCenter">
+                          <p>إلى</p><p>{{ticket.to}}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="removePadding col-xs-2">
+                      <img class="ticketLeftImg" src="/images/png/1-02.png">
+                    </div>
+                  </div>
+              </div>
+              </div>
+              <div id="printBtns" class="printBtns">
+                <paper-button raised class="page-bottom-btns" onclick="window.print();">طباعة</paper-button>
+                <paper-button raised class="page-bottom-btns" onclick="window.history.back();">رجوع</paper-button>
+              </div>
+
+        </div>
+    </template>
+
+    <script>
+
+        var conetxt;
+
+        class TicketElement extends Polymer.Element {
+            static get is() { return 'ticket-element'; }
+            static get properties() {
+                return {
+                  ticket: {
+                    type: Object,
+                    notify: true,
+                  }
+                };
+            }
+            ready(){
+              super.ready();
+              conetxt = this;
+            }
+            static get observers() {
+                return [
+                    '_routeChanged(route.ticket.*)',
+                    '_viewChanged(routeData.view)'
+                ]
+            }
+
+            _routeChanged(changeRecord) {
+                if (this.routeData.ticket_id){
+                    var ticketId = this.routeData.ticket_id;
+                    getTicket(ticketId,function (ticket) {
+                        conetxt.ticket = ticket;
+                    });
+                }
+            }
+            _viewChanged(view) {
+
+                // load data for view
+            }
+        }
+
+        window.customElements.define(TicketElement.is, TicketElement);
+    </script>
+</dom-module>
