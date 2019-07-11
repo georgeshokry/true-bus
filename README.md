@@ -8,7 +8,6 @@ auth by two types of users, manager and user
 ![alt text](https://firebasestorage.googleapis.com/v0/b/intern-4310c.appspot.com/o/true-bus%2Flogin.png?alt=media&token=376653bb-69c8-4343-be03-087e443b2561)
 
 Dashboard component:
-auth by two types of users, manager and user
 ![alt text](https://firebasestorage.googleapis.com/v0/b/intern-4310c.appspot.com/o/true-bus%2Fhome.png?alt=media&token=e2205491-79f8-4be4-8e09-f2d788ecb1ac)
 
 Trips component:
