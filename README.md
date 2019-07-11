@@ -1,6 +1,6 @@
 # true-bus
 Booking system for bus traveling and trips
-Using polymer 2.0 [Polymer](https://www.polymer-project.org)
+Using [Polymer 2.0](https://www.polymer-project.org) and [firebase](https://firebase.google.com)
 It has also accounting section for collecting all trips and calculating expenses and revenue 
 
 Login component:
