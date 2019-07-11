@@ -20,17 +20,17 @@ Accounting component:
 ![alt text](https://firebasestorage.googleapis.com/v0/b/intern-4310c.appspot.com/o/true-bus%2Faccounting.png?alt=media&token=6d3c62ba-8eac-4f7c-a61b-33a10906e324)
 and much more....
 
-## Install the Polymer-CLI
+### Install the Polymer-CLI
 
 First, make sure you have the [Polymer CLI](https://www.npmjs.com/package/polymer-cli) installed. Then run `polymer serve` to serve your application locally.
 
-## Viewing Your Application
+### Viewing Your Application
 
 ```
 $ polymer serve
 ```
 
-## Building Your Application
+### Building Your Application
 
 ```
 $ polymer build
